@@ -19,7 +19,7 @@ class AppColors {
   static const Color bgGrey = Color(0xFFF9F9F9);
   // Gold Transparent
   static const Color goldTransparent = Color.fromRGBO(197, 160, 89, 0.2);
-  final Color goldColor = const Color(0xFF93908B);
+  static Color goldColor = const Color(0xFF93908B);
   static Color darkBg = const Color(0xFF111111);
 
   // Predefined Gradient
@@ -28,4 +28,17 @@ class AppColors {
     end: Alignment.bottomCenter,
     colors: [gradientDarkStart, gradientDarkMiddle, gradientDarkEnd],
   );
+
+  static const Color primary = Color(0xFF1A0A00);
+  static const Color secondary = Color(0xFF8B5E3C);
+  static const Color accent = Color(0xFFD4A96A);
+  static const Color background = Color(0xFFFAF6F1);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color cardBg = Color(0xFFF5EFE6);
+  static const Color textPrimary = Color(0xFF1A0A00);
+  static const Color textSecondary = Color(0xFF6B4C2A);
+  static const Color textLight = Color(0xFF9E7B5A);
+  static const Color divider = Color(0xFFE0C9A8);
+  static const Color error = Color(0xFFB00020);
+  static const Color success = Color(0xFF2E7D32);
 }

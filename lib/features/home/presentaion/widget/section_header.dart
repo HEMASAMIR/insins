@@ -1,52 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:insins/features/home/presentaion/widget/custom_btn_header.dart';
 
-class SectionHeader extends StatelessWidget {
-  final String lightText;
-  final String goldText;
-  final Color goldColor;
-
-  const SectionHeader({
-    super.key,
-    required this.lightText,
-    required this.goldText,
-    required this.goldColor,
-  });
+class ShopHeaderWidget extends StatelessWidget {
+  const ShopHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "$lightText ",
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Cairo', // يفضل توحيد الخط
-              ),
+    return Container(
+      width: double.infinity,
+      height: 300,
+      color: const Color(0xFF5C4A3A),
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'المتجر',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 34,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              decoration: TextDecoration.underline,
+              decorationColor: Colors.white,
+              decorationThickness: 2,
             ),
-            Text(
-              goldText,
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: goldColor,
-                fontFamily: 'Cairo',
-              ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'اكتشف عبق الفخامة والأصالة في مكان واحد',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 13,
+              color: Color(0xFFAAAAAA),
             ),
-          ],
-        ),
-        // الخط الذهبي السفلي
-        Container(
-          height: 2.h,
-          width: 50.w,
-          color: goldColor,
-          margin: EdgeInsets.only(top: 8.h),
-        ),
-      ],
+          ),
+          SizedBox(height: 16),
+          BreadcrumbWidget(),
+        ],
+      ),
     );
   }
 }

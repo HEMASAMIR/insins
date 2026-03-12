@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:insins/features/home/presentaion/view/home.dart';
+import 'package:insins/core/di/injection.dart';
+import 'package:insins/core/networking/dio_client.dart';
+import 'package:insins/core/router/app_bloc_observer.dart';
+import 'package:insins/core/router/app_router.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DioHelper.initDio();
+  Bloc.observer = AppBlocObserver();
+  await setupDI();
   runApp(const InsinsApp());
 }
 
@@ -16,11 +24,11 @@ class InsinsApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Insins App',
+          routerConfig: RouterGenerationConfig.goRouter,
           theme: ThemeData(primarySwatch: Colors.grey, fontFamily: 'Cairo'),
-          home: const LuxuryHomePage(),
         );
       },
     );

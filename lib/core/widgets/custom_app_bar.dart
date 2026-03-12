@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insins/core/constants/app_colors.dart';
-import 'package:insins/core/widgets/custom_drawer.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
+  final VoidCallback? onMenuOpen;
+  final VoidCallback? onHomeTap;
+  final VoidCallback? onShopTap;
+  final int currentIndex;
 
-  static const double _topBarHeight = 28;
+  const CustomAppBar({
+    super.key,
+    this.onMenuOpen,
+    this.onHomeTap,
+    this.onShopTap,
+    this.currentIndex = 0,
+  });
+
+  static const double _topBarHeight = 45;
   static const double _mainBarHeight = 100;
 
   @override
@@ -16,120 +26,87 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final statusBarHeight = MediaQuery.of(context).padding.top;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    final double iconSize = screenWidth < 360 ? 20.0 : 24.0;
-    final double cartSize = screenWidth < 360 ? 18.0 : 22.0;
-    final double logoHeight = screenWidth < 360 ? 28.0 : 36.0;
-    final double socialIconSize = screenWidth < 360 ? 14.0 : 16.0;
-    final double fontSize = screenWidth < 360 ? 10.0 : 11.0;
 
     return SizedBox(
       height: statusBarHeight + _topBarHeight + _mainBarHeight,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          // ── TOP BAR
+          // ── الشريط العلوي ──────────────────────────
           Container(
             color: const Color(0xFF0D0500),
             height: statusBarHeight + _topBarHeight,
-            padding: EdgeInsets.only(
-              top: statusBarHeight,
-              left: 14,
-              right: 14,
-            ),
+            padding: EdgeInsets.only(top: statusBarHeight, left: 16, right: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(children: [
-                  Icon(Icons.phone,
-                      color: const Color(0xFFD4A96A), size: socialIconSize + 1),
-                  const SizedBox(width: 5),
-                  Text(
-                    '0503606971',
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: fontSize,
-                      color: const Color(0xFFD4A96A),
-                      fontWeight: FontWeight.w500,
+                Row(
+                  children: [
+                    Icon(Icons.phone_outlined,
+                        color: AppColors.goldIconColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      "0503606971",
+                      style: TextStyle(
+                        color: AppColors.goldIconColor,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                ]),
-                Row(children: [
-                  _SocialBtn(
-                      icon: FontAwesomeIcons.tiktok, size: socialIconSize),
-                  const SizedBox(width: 12),
-                  _SocialBtn(
-                      icon: FontAwesomeIcons.instagram, size: socialIconSize),
-                  const SizedBox(width: 12),
-                  _SocialBtn(
-                      icon: FontAwesomeIcons.snapchat, size: socialIconSize),
-                ]),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(FontAwesomeIcons.tiktok,
+                        color: AppColors.goldIconColor, size: 20),
+                    const SizedBox(width: 18),
+                    Icon(FontAwesomeIcons.instagram,
+                        color: AppColors.goldIconColor, size: 20),
+                    const SizedBox(width: 18),
+                    Icon(FontAwesomeIcons.snapchat,
+                        color: AppColors.goldIconColor, size: 20),
+                  ],
+                ),
               ],
             ),
           ),
 
-          // ── MAIN BAR
+          // ── الشريط الرئيسي ─────────────────────────
           Container(
             height: _mainBarHeight,
             color: AppColors.mainGray,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ✅ يسار: Menu + Cart
-                Row(children: [
-                  Builder(
-                    builder: (ctx) => IconButton(
+                // يسار: منيو + كارت بس (بدون أزرار نص)
+                Row(
+                  children: [
+                    IconButton(
                       icon:
-                          Icon(Icons.menu, color: Colors.white, size: iconSize),
-                      onPressed: () => Scaffold.of(ctx).openEndDrawer(),
+                          const Icon(Icons.menu, color: Colors.white, size: 30),
+                      onPressed: onMenuOpen ??
+                          () => Scaffold.of(context).openEndDrawer(),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(Icons.shopping_cart_outlined,
-                        color: const Color(0xFFD4A96A), size: cartSize),
-                  ),
-                ]),
+                    const SizedBox(width: 10),
+                    Icon(
+                      Icons.shopping_cart_outlined,
+                      color: AppColors.goldIconColor,
+                      size: 28,
+                    ),
+                  ],
+                ),
 
-                // ✅ يمين: Logo
+                // اللوجو في المنتصف/اليمين
                 Image.network(
                   'https://incense-sa.com/images/logo.png',
-                  height: logoHeight,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Text(
-                    'إنسينس | Incense',
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: screenWidth < 360 ? 13 : 15,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFD4A96A),
-                    ),
-                  ),
+                  height: 42,
                 ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SocialBtn extends StatelessWidget {
-  final IconData icon;
-  final double size;
-  const _SocialBtn({required this.icon, required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: FaIcon(icon, color: const Color(0xFFD4A96A), size: size),
     );
   }
 }

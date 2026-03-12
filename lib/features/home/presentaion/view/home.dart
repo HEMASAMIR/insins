@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:insins/core/animation/scroll_reveal.dart';
-import 'package:insins/core/constants/app_colors.dart';
-import 'package:insins/core/constants/static_model.dart';
 import 'package:insins/core/widgets/custom_app_bar.dart';
 import 'package:insins/core/widgets/custom_drawer.dart';
+import 'package:insins/features/home/data/home_model/categories_model.dart';
+import 'package:insins/features/home/presentaion/view/estekshaf_catregory.dart';
+import 'package:insins/features/home/presentaion/view/prodcut_details.dart';
+import 'package:insins/features/home/presentaion/widget/build_home.dart';
+import 'package:insins/features/home/presentaion/widget/build_shop.dart';
 import 'package:insins/features/home/presentaion/widget/custom_contact_button.dart';
-import 'package:insins/features/home/presentaion/widget/custom_footer.dart';
-import 'package:insins/features/home/presentaion/widget/custom_product_card.dart';
-import 'package:insins/features/home/presentaion/widget/custom_row.dart';
-import 'package:insins/features/home/presentaion/widget/section_header.dart';
-import 'package:insins/features/home/presentaion/widget/shiping_section.dart';
-import 'package:insins/features/home/presentaion/widget/kalam_omala.dart';
 
 class LuxuryHomePage extends StatefulWidget {
   const LuxuryHomePage({super.key});
@@ -20,61 +16,92 @@ class LuxuryHomePage extends StatefulWidget {
 }
 
 class _LuxuryHomePageState extends State<LuxuryHomePage> {
+  int _currentIndex = 0;
+  CategoryModel? _selectedCategory;
+  dynamic _selectedProduct;
+
+  // العودة للرئيسية وتصفير كل الحالات
+  void _goToHome() => setState(() {
+        _currentIndex = 0;
+        _selectedCategory = null;
+        _selectedProduct = null;
+      });
+
+  // الانتقال للمتجر العام
+  void _goToShop() => setState(() {
+        _currentIndex = 1;
+        _selectedCategory = null;
+        _selectedProduct = null;
+      });
+
+  // الانتقال لمنتجات قسم معين
+  void _onCategorySelected(CategoryModel category) {
+    setState(() {
+      _selectedCategory = category;
+      _currentIndex = 2;
+      _selectedProduct = null; // عشان لو كان فيه منتج مفتوح قبل كدة
+    });
+  }
+
+  // الانتقال لتفاصيل منتج محدد ✅
+  void _onProductSelected(dynamic product) {
+    setState(() {
+      _selectedProduct = product;
+      _currentIndex = 3;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
-      appBar: const CustomAppBar(),
-      endDrawer: const CustomDrawer(),
+      appBar: CustomAppBar(
+        onHomeTap: _goToHome,
+        onShopTap: _goToShop,
+        // الـ AppBar هيفضل منور في صفحة المتجر أو الأقسام أو التفاصيل
+        currentIndex: _currentIndex >= 1 ? 1 : _currentIndex,
+      ),
+      endDrawer: CustomDrawer(
+        onClose: () => Navigator.of(context).pop(),
+        onHomeTap: _goToHome,
+        onShopTap: _goToShop,
+      ),
       body: Stack(
         children: [
-          // الطبقة 1: محتوى السكرول بتاعك
-          SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                SizedBox(height: const CustomAppBar().preferredSize.height),
-                const ShopHeaderWidget(),
-                ShopCountBar(totalCount: products.length),
-                ListView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final p = products[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      child: ProductCardWidget(
-                        imageUrl: p.imageUrl,
-                        category: p.category,
-                        name: p.name,
-                        price: p.price,
-                        onAddToCart: () {},
-                      ),
-                    );
-                  },
-                ),
-                const ScrollReveal(
-                  delay: 600,
-                  child: ShippingSection(
-                      goldColor: AppColors.gold, darkBg: AppColors.darkGrey),
-                ),
-                const ScrollReveal(
-                  delay: 800,
-                  child: TestimonialsSection(goldColor: AppColors.gold),
-                ),
-                const ScrollReveal(
-                  delay: 1000,
-                  child: FooterWidget(),
-                ),
-              ],
-            ),
+          IndexedStack(
+            index: _currentIndex,
+            children: [
+              // 0: الصفحة الرئيسية
+              HomeContentWidget(onCategorySelected: _onCategorySelected),
+
+              // 1: المتجر العام
+              const ShopContentWidget(),
+
+              // 2: تفاصيل المجموعة (قائمة منتجات القسم)
+              _selectedCategory == null
+                  ? const SizedBox()
+                  : CategoryDetailsPage(
+                      category: _selectedCategory!,
+                      onProductTap: _onProductSelected, // ✅ ربطنا الدالة هنا
+                    ),
+
+              // 3: تفاصيل المنتج المختار
+              _selectedProduct == null
+                  ? const SizedBox()
+                  : ProductDetailsView(
+                      product: _selectedProduct!,
+                      onTap: (p1) {
+                        setState(() {
+                          _selectedProduct = null;
+                          _currentIndex = 3;
+                        });
+                      },
+                    ),
+            ],
           ),
 
-          // ✅ الطبقة 2: الـ Action Button بتاعك (يظهر فوق كل حاجة)
+          // أزرار التواصل الثابتة
           const Positioned(
             bottom: 20,
             right: 20,

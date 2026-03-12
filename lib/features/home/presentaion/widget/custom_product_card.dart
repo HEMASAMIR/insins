@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:insins/core/constants/app_constants.dart';
 
 class ProductCardWidget extends StatelessWidget {
   final String imageUrl;
@@ -14,10 +16,13 @@ class ProductCardWidget extends StatelessWidget {
     required this.name,
     required this.price,
     required this.onAddToCart,
+    void Function()? onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final String fullImageUrl = "${AppConstants.baseUrl}/${imageUrl.trim()}";
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
@@ -34,7 +39,7 @@ class ProductCardWidget extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min, // ← مهم عشان مايتمددش
+          mainAxisSize: MainAxisSize.min,
           children: [
             // ── صورة المنتج
             ClipRRect(
@@ -42,16 +47,34 @@ class ProductCardWidget extends StatelessWidget {
                   const BorderRadius.vertical(top: Radius.circular(12)),
               child: AspectRatio(
                 aspectRatio: 1,
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                child: CachedNetworkImage(
+                  // ✅ استخدام الرابط الكامل الذي تم تجهيزه
+                  imageUrl: fullImageUrl,
+                  fit: BoxFit
+                      .contain, // BoxFit.contain أفضل لصور المنتجات لعدم قص الأطراف
+                  placeholder: (context, url) => Container(
                     color: const Color(0xFFF5F0EB),
                     child: const Center(
-                      child: Icon(Icons.image_not_supported,
-                          color: Color(0xFFCCBB99), size: 40),
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFCCBB99),
+                        strokeWidth: 2,
+                      ),
                     ),
                   ),
+                  errorWidget: (context, url, error) {
+                    // طباعة الخطأ في الـ Console لمعرفة السبب إذا لم تظهر الصورة
+                    debugPrint("Error loading image: $url");
+                    return Container(
+                      color: const Color(0xFFF5F0EB),
+                      child: const Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Color(0xFFCCBB99),
+                          size: 40,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

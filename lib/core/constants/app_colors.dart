@@ -21,6 +21,7 @@ class AppColors {
   static const Color goldTransparent = Color.fromRGBO(197, 160, 89, 0.2);
   static Color goldColor = const Color(0xFF93908B);
   static Color darkBg = const Color(0xFF111111);
+  static Color goldIconColor = Color(0xFFD4A96A);
 
   // Predefined Gradient
   static const LinearGradient darkGradient = LinearGradient(

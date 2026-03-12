@@ -1,45 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:insins/features/home/presentaion/widget/custom_btn_header.dart';
 
-class ShopHeaderWidget extends StatelessWidget {
-  const ShopHeaderWidget({super.key});
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onSeeAll;
+
+  const SectionHeader({
+    super.key,
+    required this.title,
+    this.onSeeAll,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 300,
-      color: const Color(0xFF5C4A3A),
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // العنوان الرئيسي بالخط العريض
           Text(
-            'المتجر',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 34,
+            title,
+            style: const TextStyle(
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
-              decoration: TextDecoration.underline,
-              decorationColor: Colors.white,
-              decorationThickness: 2,
+              fontFamily: 'Cairo', // نفس خط المتجر
+              color: Color(0xFF1A1A1A),
             ),
           ),
-          SizedBox(height: 10),
-          Text(
-            'اكتشف عبق الفخامة والأصالة في مكان واحد',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 13,
-              color: Color(0xFFAAAAAA),
+
+          // زر "عرض الكل" بلمسة ذهبية
+          if (onSeeAll != null)
+            InkWell(
+              onTap: onSeeAll,
+              child: const Text(
+                "عرض الكل",
+                style: TextStyle(
+                  color: Color(0xFFD4A96A), // اللون الذهبي بتاعك
+                  fontFamily: 'Cairo',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ),
-          SizedBox(height: 16),
-          BreadcrumbWidget(),
         ],
       ),
     );

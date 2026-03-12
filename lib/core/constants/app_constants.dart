@@ -1,6 +1,7 @@
 class AppConstants {
   // API
-  static const String baseUrl = 'https://incense-sa.com/api';
+  static const String baseUrl = 'https://incense-sa.com';
+  static const String endPoint = "/api/MobileApi/products"; // ✅
 
   // Categories IDs
   static const int menPerfumes = 9;

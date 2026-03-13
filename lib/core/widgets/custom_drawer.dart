@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/animation/slide_reveal_animation.dart';
+import 'package:insins/core/widgets/custom_menu.dart';
 import 'package:insins/core/widgets/drawer_item_widget.dart';
 import 'package:insins/core/widgets/language_selector_widget.dart';
 import 'package:insins/features/home/presentaion/widget/custom_contact_button.dart';
@@ -8,6 +10,7 @@ class CustomDrawer extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback? onHomeTap;
   final VoidCallback? onShopTap;
+  final VoidCallback? onAboutTap;
 
   final GlobalKey<SlideRevealAnimationState> _animationKey = GlobalKey();
 
@@ -16,27 +19,32 @@ class CustomDrawer extends StatelessWidget {
     required this.onClose,
     this.onHomeTap,
     this.onShopTap,
+    this.onAboutTap,
   });
 
   Future<void> _handleClose() async {
     await _animationKey.currentState?.reverse();
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 30));
     onClose();
   }
 
-  // ✅ إغلاق الدرور + تنفيذ الأكشن
+  // جوه CustomDrawer
   Future<void> _navigate(VoidCallback? action) async {
     await _animationKey.currentState?.reverse();
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 30));
+
     onClose();
-    action?.call();
+
+    if (action != null) {
+      action();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return SlideRevealAnimation(
       key: _animationKey,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 300),
       child: Container(
         width: double.infinity,
         height: double.infinity,
@@ -51,49 +59,49 @@ class CustomDrawer extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: IconButton(
-                        icon: const Icon(Icons.close,
-                            color: Colors.white, size: 30),
+                        icon:
+                            Icon(Icons.close, color: Colors.white, size: 30.sp),
                         onPressed: _handleClose,
                       ),
                     ),
                   ),
                   const Spacer(flex: 3),
 
-                  // ✅ الرئيسية - بيروح للـ Home
                   DrawerItemWidget(
                     title: 'الرئيسية',
                     onTap: () => _navigate(onHomeTap),
                   ),
 
+                  // ✅ التعديل هنا: يروح لقسم "من نحن"
                   DrawerItemWidget(
                     title: 'من نحن',
-                    onTap: _handleClose,
+                    onTap: () => _navigate(onAboutTap),
                   ),
 
                   DrawerItemWidget(
                     title: 'قسم العطور',
-                    onTap: _handleClose,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CategoryMenuWidget()),
+                      );
+                    },
                     hasArrow: true,
                   ),
 
-                  // ✅ المتجر - بيروح للـ Shop
                   DrawerItemWidget(
                     title: 'المتجر',
                     onTap: () => _navigate(onShopTap),
                   ),
 
-                  DrawerItemWidget(
-                    title: 'تواصل معنا',
-                    onTap: _handleClose,
-                  ),
-
                   const Spacer(flex: 2),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20.h),
                     child: LanguageSelectorWidget(onTap: () {}),
                   ),
                   const Spacer(flex: 2),
-                  const SizedBox(height: 80),
+                  SizedBox(height: 80.h),
                 ],
               ),
               const Positioned(

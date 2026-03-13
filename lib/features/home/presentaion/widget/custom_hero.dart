@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:insins/core/constants/app_colors.dart';
 
 class HeroBannerWidget extends StatefulWidget {
-  const HeroBannerWidget({super.key});
+  final VoidCallback? onShopTap;
+
+  const HeroBannerWidget({super.key, this.onShopTap});
 
   @override
   State<HeroBannerWidget> createState() => _HeroBannerWidgetState();
@@ -68,15 +70,12 @@ class _HeroBannerWidgetState extends State<HeroBannerWidget>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // الخط الذهبي العلوي
                   Container(
                     width: 60,
                     height: 1.5,
                     color: AppColors.gold,
                     margin: const EdgeInsets.only(bottom: 20),
                   ),
-
-                  // العنوان العربي
                   const Text(
                     'عنوان الفخامة والتميّز',
                     textAlign: TextAlign.center,
@@ -91,8 +90,6 @@ class _HeroBannerWidgetState extends State<HeroBannerWidget>
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // العنوان الإنجليزي
                   const Text(
                     'Title of Luxury & Distinction',
                     textAlign: TextAlign.center,
@@ -104,8 +101,6 @@ class _HeroBannerWidgetState extends State<HeroBannerWidget>
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // الوصف
                   const Text(
                     'أرقى أنواع العطور والبخور ومنتجات التجميل\nالمستوحاة من أصالة التراث العربي.',
                     textAlign: TextAlign.center,
@@ -117,30 +112,23 @@ class _HeroBannerWidgetState extends State<HeroBannerWidget>
                     ),
                   ),
                   const SizedBox(height: 36),
-
-                  // الأزرار
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // زر تسوق العطور
-                      _HeroButton(
-                        label: 'تسوق العطور',
-                        filled: true,
-                        onTap: () {},
-                      ),
-                      const SizedBox(width: 16),
-                      // زر اكتشف العود
                       _HeroButton(
                         label: 'اكتشف العود',
                         filled: false,
-                        onTap: () {},
+                        onTap: () => widget.onShopTap?.call(),
+                      ),
+                      const SizedBox(width: 16),
+                      _HeroButton(
+                        label: 'تسوق العطور',
+                        filled: true,
+                        onTap: () => widget.onShopTap?.call(),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 40),
-
-                  // سهم للأسفل
                   const _BouncingArrow(),
                 ],
               ),
@@ -185,9 +173,7 @@ class _HeroButtonState extends State<_HeroButton> {
                 ? (_hovered ? Colors.white : AppColors.gold)
                 : Colors.transparent,
             border: Border.all(
-              color: widget.filled
-                  ? (_hovered ? AppColors.gold : AppColors.gold)
-                  : Colors.white,
+              color: AppColors.gold,
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(4),

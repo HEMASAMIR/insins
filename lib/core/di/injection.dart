@@ -1,5 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:insins/features/home/data/home_repo/cart_repo/cart_repo.dart';
+import 'package:insins/features/home/data/home_repo/cart_repo/cart_repo_impl.dart';
+import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:insins/core/networking/dio_client.dart';
 import 'package:insins/features/home/data/home_repo/categories_repo/categories_repo.dart';
 import 'package:insins/features/home/data/home_repo/categories_repo/categories_repo_impl.dart';
@@ -14,19 +17,27 @@ import 'package:insins/features/home/logic/cubit/product_details/productdetails_
 final sl = GetIt.instance;
 
 Future<void> setupDI() async {
+  // ── SharedPreferences ─────────────────────────────────────
+  final prefs = await SharedPreferences.getInstance();
+  sl.registerSingleton<SharedPreferences>(prefs);
+
   // ── Repositories ─────────────────────────────────────
   sl.registerLazySingleton<ProductRepository>(
     () => ProductRepositoryImpl(DioHelper.dio!),
   );
-
   sl.registerLazySingleton<CategoriesRepo>(
     () => CategoriesRepoImpl(DioHelper.dio!),
   );
   sl.registerLazySingleton<ProductDetailsRepo>(
-    () => ProductDetailsRepoImpl(DioHelper.dio!), // تأكد إن Dio مسجل عندك برضه
+    () => ProductDetailsRepoImpl(DioHelper.dio!),
   );
+  sl.registerLazySingleton<CartRepo>(
+    () => CartRepoImpl(sl<SharedPreferences>()),
+  );
+
   // ── Cubits ───────────────────────────────────────────
   sl.registerLazySingleton(() => ProductsCubit(sl()));
   sl.registerFactory(() => CategorieCubit(sl()));
   sl.registerFactory(() => ProductDetailsCubit(sl()));
+  sl.registerLazySingleton(() => CartCubit(sl<CartRepo>()));
 }

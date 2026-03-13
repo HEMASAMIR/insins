@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CategoryWidgets {
-  static Widget buildStaticHeader(String title) {
+  static Widget buildStaticHeader(String title, {VoidCallback? onHomeTap}) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 30.h, horizontal: 20.w),
@@ -33,13 +33,13 @@ class CategoryWidgets {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildBadge('المتجر', isActive: true),
+              _buildBadge('المتجر', isActive: true, onTap: null),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.w),
                 child: Text('/',
                     style: TextStyle(color: Colors.white30, fontSize: 16.sp)),
               ),
-              _buildBadge('الرئيسية', isActive: false),
+              _buildBadge('الرئيسية', isActive: false, onTap: onHomeTap),
             ],
           ),
         ],
@@ -47,26 +47,29 @@ class CategoryWidgets {
     );
   }
 
-  static Widget _buildBadge(String text, {required bool isActive}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.white.withOpacity(0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(20.r),
-        border: isActive ? Border.all(color: Colors.white24) : null,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isActive ? Colors.white : Colors.white54,
-          fontSize: 12.sp,
-          fontFamily: 'Cairo',
+  static Widget _buildBadge(String text,
+      {required bool isActive, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20.r),
+          border: isActive ? Border.all(color: Colors.white24) : null,
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.white54,
+            fontSize: 12.sp,
+            fontFamily: 'Cairo',
+          ),
         ),
       ),
     );
   }
 
-  // 2. شكل الـ Empty State (لما ميكونش فيه منتجات)
   static Widget buildEmptyState({bool isError = false}) {
     return Center(
       child: Column(

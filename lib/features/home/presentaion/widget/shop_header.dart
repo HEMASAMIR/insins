@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:insins/features/home/presentaion/widget/custom_btn_header.dart';
 
 class ShopHeaderWidget extends StatelessWidget {
-  const ShopHeaderWidget({super.key});
+  final VoidCallback? onHomeTap;
+  final VoidCallback? onShopTap;
+  const ShopHeaderWidget({
+    super.key,
+    this.onHomeTap,
+    this.onShopTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +17,7 @@ class ShopHeaderWidget extends StatelessWidget {
       height: 300,
       color: const Color(0xFF5C4A3A),
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -39,7 +45,10 @@ class ShopHeaderWidget extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          BreadcrumbWidget(),
+          BreadcrumbWidget(
+            onHomeTap: onHomeTap,
+            onShopTap: onShopTap,
+          ),
         ],
       ),
     );

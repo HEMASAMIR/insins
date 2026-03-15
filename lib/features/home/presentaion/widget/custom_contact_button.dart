@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:insins/core/widgets/whatsapp_helper.dart';
 
 class QuickContactButtons extends StatefulWidget {
   const QuickContactButtons({super.key});
@@ -19,7 +20,6 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
   void initState() {
     super.initState();
 
-    // 1. إعداد أنيميشن النبض (Pulse)
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -29,7 +29,6 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    // 2. أنيميشن ظهور الأزرار (Fade In)
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) setState(() => _isVisible = true);
     });
@@ -49,14 +48,12 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // زر الواتساب - مع تأثير النبض المستمر
+          // ✅ زر الواتساب
           ScaleTransition(
             scale: _scaleAnimation,
             child: _buildCircleBtn(
               icon: FontAwesomeIcons.whatsapp,
-              onTap: () {
-                // ضيف الأكشن هنا (فتح الواتساب)
-              },
+              onTap: () => WhatsAppHelper.sendGeneralMessage(), // ✅
               bgColor: const Color(0xFF25D366),
               isMain: true,
             ),
@@ -64,12 +61,10 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
 
           SizedBox(height: 15.h),
 
-          // زر الاتصال - ثابت (أصغر شوية زي الـ Mini في الـ CSS)
+          // ✅ زر الاتصال
           _buildCircleBtn(
             icon: Icons.phone,
-            onTap: () {
-              // ضيف الأكشن هنا (اتصال)
-            },
+            onTap: () => WhatsAppHelper.call(), // ✅
             bgColor: const Color(0xFF9E9E9E).withOpacity(0.9),
             isMain: false,
           ),
@@ -78,7 +73,6 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
     );
   }
 
-  // ميثود بناء الزرار الموحدة عشان الكود يكون نظيف
   Widget _buildCircleBtn({
     required IconData icon,
     required VoidCallback onTap,
@@ -88,7 +82,7 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: isMain ? 54.w : 45.w, // الرئيسي أكبر شوية
+        width: isMain ? 54.w : 45.w,
         height: isMain ? 54.w : 45.w,
         decoration: BoxDecoration(
           color: bgColor,

@@ -4,10 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/constants/app_colors.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insins/core/widgets/custom_drawer.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'package:insins/core/widgets/whatsapp_helper.dart'; // ✅
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuOpen;
@@ -56,8 +56,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // ✅ استدعاء من WhatsAppHelper
                 GestureDetector(
-                  onTap: () => _launchURL('tel:0503606971'),
+                  onTap: () => WhatsAppHelper.call(),
                   child: Row(
                     children: [
                       Icon(Icons.phone_outlined,

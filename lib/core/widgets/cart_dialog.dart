@@ -13,7 +13,8 @@ class CartDialogs {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Directionality(
+      builder: (dialogContext) => Directionality(
+        // ✅
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape:
@@ -57,7 +58,7 @@ class CartDialogs {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(dialogContext); // ✅
                           onContinueShopping();
                         },
                         style: OutlinedButton.styleFrom(
@@ -80,7 +81,7 @@ class CartDialogs {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(dialogContext); // ✅
                           onGoToCart();
                         },
                         style: ElevatedButton.styleFrom(
@@ -113,7 +114,8 @@ class CartDialogs {
   static Future<bool?> showDeleteConfirmation(BuildContext context) {
     return showDialog<bool>(
       context: context,
-      builder: (_) => Directionality(
+      builder: (dialogContext) => Directionality(
+        // ✅
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape:
@@ -147,7 +149,8 @@ class CartDialogs {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context, false),
+                        onPressed: () =>
+                            Navigator.pop(dialogContext, false), // ✅
                         style: OutlinedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                           side: const BorderSide(color: Colors.grey),
@@ -167,7 +170,8 @@ class CartDialogs {
                     SizedBox(width: 10.w),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context, true),
+                        onPressed: () =>
+                            Navigator.pop(dialogContext, true), // ✅
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -198,7 +202,8 @@ class CartDialogs {
   static Future<void> showDeletedSuccess(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (_) => Directionality(
+      builder: (dialogContext) => Directionality(
+        // ✅
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape:
@@ -230,7 +235,7 @@ class CartDialogs {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(dialogContext), // ✅
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding: EdgeInsets.symmetric(vertical: 12.h),

@@ -22,24 +22,19 @@ class CartScreen extends StatelessWidget {
         textDirection: TextDirection.ltr,
         child: Scaffold(
           backgroundColor: const Color(0xFFFBFBFB),
-          appBar: CustomAppBar(
-            onCartTap: () => Navigator.pop(context),
-          ),
-          body: Directionality(
-            textDirection: TextDirection.rtl,
-            child: BlocBuilder<CartCubit, CartState>(
-              builder: (context, state) {
-                if (state is CartLoading) {
-                  return const Center(
-                      child: CircularProgressIndicator(color: AppColors.gold));
-                }
-                if (state is CartLoaded) {
-                  if (state.items.isEmpty) return _buildEmptyCart(context);
-                  return _buildCartContent(context, state);
-                }
-                return const SizedBox();
-              },
-            ),
+          appBar: CustomAppBar(),
+          body: BlocBuilder<CartCubit, CartState>(
+            builder: (context, state) {
+              if (state is CartLoading) {
+                return const Center(
+                    child: CircularProgressIndicator(color: AppColors.gold));
+              }
+              if (state is CartLoaded) {
+                if (state.items.isEmpty) return _buildEmptyCart(context);
+                return _buildCartContent(context, state);
+              }
+              return const SizedBox();
+            },
           ),
         ),
       ),
@@ -117,14 +112,21 @@ class CartScreen extends StatelessWidget {
 
   Widget _buildHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+      padding: EdgeInsets.only(
+        top: kToolbarHeight + 120.h, // ✅ عشان ميتغطاش بالـ AppBar
+        bottom: 20.h,
+        left: 16.w,
+        right: 16.w,
+      ),
       child: Align(
         alignment: Alignment.centerRight,
-        child: Text('سلة المشتريات',
-            style: TextStyle(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Cairo')),
+        child: Text(
+          'سلة المشتريات',
+          style: TextStyle(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Cairo'),
+        ),
       ),
     );
   }

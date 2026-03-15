@@ -30,80 +30,91 @@ class ShopContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProductsCubit, ProductsState>(
       builder: (context, state) {
-        return SingleChildScrollView(
-          key: const PageStorageKey('shop'),
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-              SizedBox(height: kToolbarHeight + 40.h),
-              ShopHeaderWidget(
-                onHomeTap: onHomeTap,
-                onShopTap: null,
-              ),
-              if (state is ProductsLoading)
-                const Padding(
-                  padding: EdgeInsets.all(40),
-                  child: Center(child: CircularProgressIndicator()),
+        return ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            physics: const BouncingScrollPhysics(
+              decelerationRate: ScrollDecelerationRate.fast,
+            ),
+          ),
+          child: SingleChildScrollView(
+            key: const PageStorageKey('shop'),
+            physics: const BouncingScrollPhysics(
+              decelerationRate: ScrollDecelerationRate.fast,
+            ),
+            child: Column(
+              children: [
+                SizedBox(height: kToolbarHeight + 40.h),
+                ShopHeaderWidget(
+                  onHomeTap: onHomeTap,
+                  onShopTap: null,
                 ),
-              if (state is ProductsError)
-                Padding(
-                  padding: EdgeInsets.all(20.w),
-                  child: Center(
-                    child: Text(
-                      state.message,
-                      style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                if (state is ProductsLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                if (state is ProductsError)
+                  Padding(
+                    padding: EdgeInsets.all(20.w),
+                    child: Center(
+                      child: Text(
+                        state.message,
+                        style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                      ),
                     ),
                   ),
-                ),
-              if (state is ProductsLoaded) ...[
-                ShopCountBar(totalCount: state.products.length),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.h),
-                  child: Column(
-                    children: state.products
-                        .map((p) => Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w, vertical: 8.h),
-                              child: GestureDetector(
-                                onTap: () => onProductSelected(p),
-                                child: ProductCardWidget(
-                                  imageUrl: p.imageUrl!,
-                                  category: p.categoryName!,
-                                  name: p.nameAr,
-                                  price: p.price,
-                                  onTap: () => onProductSelected(p),
-                                  onAddToCart: () async {
-                                    context.read<CartCubit>().addToCart(
-                                          CartItemModel(
-                                            id: p.id.toString(),
-                                            name: p.nameAr,
-                                            price: p.price.toDouble(),
-                                            image: p.imageUrl ?? '',
-                                          ),
-                                        );
-                                    if (context.mounted) {
-                                      await CartDialogs.showAddedToCart(
-                                        context,
-                                        productName: p.nameAr,
-                                        price: p.price.toDouble(),
-                                        onContinueShopping: () {},
-                                        onGoToCart: () => onGoToCart?.call(),
-                                      );
-                                    }
-                                  },
-                                ),
-                              ),
-                            ))
-                        .toList(),
+                if (state is ProductsLoaded) ...[
+                  ShopCountBar(totalCount: state.products.length),
+                  ListView.builder(
+                    // ✅ بدل Column + map
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: state.products.length,
+                    itemBuilder: (context, index) {
+                      final p = state.products[index];
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.w, vertical: 8.h),
+                        child: GestureDetector(
+                          onTap: () => onProductSelected(p),
+                          child: ProductCardWidget(
+                            imageUrl: p.imageUrl!,
+                            category: p.categoryName!,
+                            name: p.nameAr,
+                            price: p.price,
+                            onTap: () => onProductSelected(p),
+                            onAddToCart: () async {
+                              context.read<CartCubit>().addToCart(
+                                    CartItemModel(
+                                      id: p.id.toString(),
+                                      name: p.nameAr,
+                                      price: p.price.toDouble(),
+                                      image: p.imageUrl ?? '',
+                                    ),
+                                  );
+                              if (context.mounted) {
+                                await CartDialogs.showAddedToCart(
+                                  context,
+                                  productName: p.nameAr,
+                                  price: p.price.toDouble(),
+                                  onContinueShopping: () {},
+                                  onGoToCart: () => onGoToCart?.call(),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
+                ],
+                const ScrollReveal(
+                  delay: 600,
+                  child: TestimonialsSection(goldColor: AppColors.gold),
                 ),
+                const ScrollReveal(delay: 800, child: FooterWidget()),
               ],
-              const ScrollReveal(
-                delay: 600,
-                child: TestimonialsSection(goldColor: AppColors.gold),
-              ),
-              const ScrollReveal(delay: 800, child: FooterWidget()),
-            ],
+            ),
           ),
         );
       },

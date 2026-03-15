@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insins/core/di/injection.dart';
 import 'package:insins/core/widgets/custom_app_bar.dart';
 import 'package:insins/core/widgets/custom_drawer.dart';
 import 'package:insins/features/home/data/home_model/categories_model.dart';
 import 'package:insins/features/home/data/home_model/product_details_model.dart';
+import 'package:insins/features/home/presentaion/add_review/logic/add_review_cubit/addreview_cubit.dart';
 import 'package:insins/features/home/presentaion/view/cart_screen.dart';
 import 'package:insins/features/home/presentaion/view/estekshaf_catregory.dart';
 import 'package:insins/features/home/presentaion/widget/build_home.dart';
 import 'package:insins/features/home/presentaion/widget/build_shop.dart';
 import 'package:insins/features/home/presentaion/widget/custom_contact_button.dart';
 import 'package:insins/features/home/presentaion/widget/details_product_card.dart';
-import 'package:insins/features/home/presentaion/widget/custom_footer.dart';
 
 class LuxuryHomePage extends StatefulWidget {
   const LuxuryHomePage({super.key});
@@ -126,34 +127,31 @@ class _LuxuryHomePageState extends State<LuxuryHomePage> {
                   : CategoryDetailsPage(
                       category: _selectedCategory!,
                       onProductTap: _onProductSelected,
+                      onBack: () => setState(() {
+                        _currentIndex = 1;
+                        _selectedCategory = null;
+                      }),
                     ),
 
-              // 3: تفاصيل المنتج
+              // 3: تفاصيل المنتج ✅ بدون SingleChildScrollView
               _selectedProduct == null
                   ? const SizedBox()
-                  : SingleChildScrollView(
-                      key: const PageStorageKey('details_scroll'),
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          SizedBox(height: kToolbarHeight + 50.h),
-                          DetailsProductCard(
-                            product: _selectedProduct!,
-                            onTap: (product) {},
-                            onBack: () {
-                              setState(() {
-                                _currentIndex =
-                                    _selectedCategory == null ? 1 : 2;
-                              });
-                            },
-                          ),
-                          SizedBox(height: 50.h),
-                          const FooterWidget(),
-                        ],
+                  : BlocProvider(
+                      create: (_) => sl<AddReviewCubit>(),
+                      child: DetailsProductCard(
+                        product: _selectedProduct!,
+                        onTap: (product) {},
+                        onBack: () {
+                          setState(() {
+                            _currentIndex = _selectedCategory == null ? 1 : 2;
+                          });
+                        },
+                        onGoToShop: () => _goToShop(),
+                        onGoToCart: () => _goToCart(),
                       ),
                     ),
 
-              // 4: سلة المشتريات ✅
+              // 4: سلة المشتريات
               CartScreen(
                 onBackToShop: _goToShop,
               ),

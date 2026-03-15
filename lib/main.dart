@@ -6,6 +6,8 @@ import 'package:insins/core/networking/dio_client.dart';
 import 'package:insins/core/router/app_bloc_observer.dart';
 import 'package:insins/core/router/app_router.dart';
 
+final GlobalKey<ScaffoldMessengerState> snackbarKey =
+    GlobalKey<ScaffoldMessengerState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DioHelper.initDio();
@@ -25,6 +27,7 @@ class InsinsApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp.router(
+          scaffoldMessengerKey: snackbarKey,
           debugShowCheckedModeBanner: false,
           title: 'Insins App',
           routerConfig: RouterGenerationConfig.goRouter,

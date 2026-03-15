@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:insins/core/errors/failure.dart';
-import 'package:insins/features/home/data/home_model/home_data_model.dart';
 import 'package:insins/features/home/data/home_model/product_details_model.dart';
 import 'package:insins/features/home/data/home_repo/products_repo/home_repo.dart';
 
@@ -12,14 +11,12 @@ class ProductRepositoryImpl implements ProductRepository {
   ProductRepositoryImpl(this.dio);
 
   @override
-  Future<Either<Failure, List<ProductModel>>> getProducts() async {
+  Future<Either<Failure, List<ProductDetailsModel>>> getProducts() async {
     try {
       final response = await dio.get('/api/MobileApi/products');
-
-      // ✅ الـ data جوا object
       final List<dynamic> data = response.data['data'];
-
-      final products = data.map((json) => ProductModel.fromJson(json)).toList();
+      final products =
+          data.map((json) => ProductDetailsModel.fromJson(json)).toList();
       return Right(products);
     } on DioException catch (e) {
       if (e.response != null) {
@@ -38,17 +35,39 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Either<Failure, List<ProductDetailsModel>>> getProductsByCategoryId(
       int categoryId) async {
     try {
-      final response = await dio.get('/api/MobileApi/products/$categoryId');
+      final response = await dio.get(
+        '/api/MobileApi/products',
+        queryParameters: {'categoryId': categoryId}, // ✅
+      );
+      final List<dynamic> data = response.data['data'];
+      final products =
+          data.map((json) => ProductDetailsModel.fromJson(json)).toList();
+      return Right(products);
+    } on DioException catch (e) {
+      log("Dio Error: ${e.response?.statusCode} - ${e.response?.data}");
+      return Left(ServerFailure(e.message ?? 'Server Error'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 
-      if (response.data['data'] is Map) {
-        final product = ProductDetailsModel.fromJson(response.data['data']);
-        return Right([product]);
-      } else {
-        final List<dynamic> data = response.data['data'];
-        final products =
-            data.map((json) => ProductDetailsModel.fromJson(json)).toList();
-        return Right(products);
-      }
+  @override
+  Future<Either<Failure, List<ProductDetailsModel>>> searchProducts({
+    required int categoryId,
+    String? search,
+  }) async {
+    try {
+      final response = await dio.get(
+        '/api/MobileApi/products',
+        queryParameters: {
+          'categoryId': categoryId,
+          if (search != null && search.isNotEmpty) 'search': search,
+        },
+      );
+      final List<dynamic> data = response.data['data'];
+      final products =
+          data.map((json) => ProductDetailsModel.fromJson(json)).toList();
+      return Right(products);
     } on DioException catch (e) {
       return Left(ServerFailure(e.message ?? 'Server Error'));
     } catch (e) {

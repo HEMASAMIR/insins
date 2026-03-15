@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/animation/slide_reveal_animation.dart';
+import 'package:insins/core/di/injection.dart';
 import 'package:insins/core/widgets/custom_menu.dart';
 import 'package:insins/core/widgets/drawer_item_widget.dart';
 import 'package:insins/core/widgets/language_selector_widget.dart';
+import 'package:insins/features/home/logic/cubit/homecubit_cubit.dart';
 import 'package:insins/features/home/presentaion/widget/custom_contact_button.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -84,12 +87,24 @@ class CustomDrawer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const CategoryMenuWidget()),
+                          builder: (context) => CategoryMenuWidget(
+                            onCategorySelected: (categoryId, categoryName) {
+                              // 1. اقفل الـ CategoryMenu
+                              Navigator.pop(context);
+
+                              // 2. جيب الداتا
+                              sl<ProductsCubit>()
+                                  .fetchProductsByCategory(categoryId);
+
+                              // 3. ✅ اقفل الـ Drawer وروح لشاشة المتجر
+                              _navigate(onShopTap);
+                            },
+                          ),
+                        ),
                       );
                     },
                     hasArrow: true,
                   ),
-
                   DrawerItemWidget(
                     title: 'المتجر',
                     onTap: () => _navigate(onShopTap),

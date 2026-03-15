@@ -1,7 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:insins/features/home/data/home_repo/add_review_repo/add_review_repo.dart';
+import 'package:insins/features/home/data/home_repo/add_review_repo/add_review_repo_impl.dart';
 import 'package:insins/features/home/data/home_repo/cart_repo/cart_repo.dart';
 import 'package:insins/features/home/data/home_repo/cart_repo/cart_repo_impl.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
+import 'package:insins/features/home/presentaion/add_review/logic/add_review_cubit/addreview_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:insins/core/networking/dio_client.dart';
 import 'package:insins/features/home/data/home_repo/categories_repo/categories_repo.dart';
@@ -34,10 +37,14 @@ Future<void> setupDI() async {
   sl.registerLazySingleton<CartRepo>(
     () => CartRepoImpl(sl<SharedPreferences>()),
   );
+  sl.registerLazySingleton<AddReviewRepo>(
+    () => AddReviewRepoImpl(DioHelper.dio!),
+  );
 
   // ── Cubits ───────────────────────────────────────────
   sl.registerLazySingleton(() => ProductsCubit(sl()));
   sl.registerFactory(() => CategorieCubit(sl()));
   sl.registerFactory(() => ProductDetailsCubit(sl()));
   sl.registerLazySingleton(() => CartCubit(sl<CartRepo>()));
+  sl.registerFactory(() => AddReviewCubit(sl()));
 }

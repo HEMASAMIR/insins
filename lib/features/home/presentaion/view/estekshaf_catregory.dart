@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart'; // مهم جداً للـ push
+import 'package:insins/core/router/routes.dart';
 import 'package:insins/features/home/data/cart_model/cart_model.dart';
 import 'package:insins/features/home/data/home_model/categories_model.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
@@ -8,9 +10,9 @@ import 'package:insins/features/home/logic/cubit/product_details/productdetails_
 import 'package:insins/features/home/logic/cubit/product_details/productdetails_state.dart';
 import 'package:insins/features/home/presentaion/widget/custom_footer.dart';
 import 'package:insins/features/home/presentaion/widget/custom_product_list.dart';
-import 'package:insins/features/home/presentaion/widget/details_product_card.dart';
 
 class CategoryDetailsPage extends StatefulWidget {
+  final VoidCallback onBack;
   final CategoryModel category;
   final Function(dynamic) onProductTap;
 
@@ -18,6 +20,7 @@ class CategoryDetailsPage extends StatefulWidget {
     super.key,
     required this.category,
     required this.onProductTap,
+    required this.onBack,
   });
 
   @override
@@ -68,7 +71,6 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                           child: VerticalProductCard(
                             product: currentProduct,
                             onAdd: () {
-                              // ✅ منطق إضافة للسلة هنا
                               final cartItem = CartItemModel(
                                 id: currentProduct.id.toString(),
                                 name: currentProduct.nameAr,
@@ -92,18 +94,12 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                               );
                             },
                             onTap: () {
-                              // ✅ عند الضغط على الكارت يروح للتفاصيل
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DetailsProductCard(
-                                    product: currentProduct,
-                                    onTap: (selectedProduct) {
-                                      widget.onProductTap(selectedProduct);
-                                    },
-                                    onBack: () => Navigator.pop(context),
-                                  ),
-                                ),
+                              // ✅ تم التعديل هنا لاستخدام GoRouter
+                              // ده هيحل مشكلة الـ ProviderNotFoundException
+                              // وهيحل مشكلة الـ AssertionError عند الـ Back
+                              context.push(
+                                AppRoutes.productDetailsScreen,
+                                extra: currentProduct,
                               );
                             },
                           ),
@@ -139,7 +135,7 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: widget.onBack,
             icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           ),
           Expanded(

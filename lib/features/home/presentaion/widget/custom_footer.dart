@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:insins/core/di/injection.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/presentaion/view/policy_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -92,9 +93,9 @@ class FooterWidget extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BlocProvider.value(
-                          value: BlocProvider.of<CartCubit>(
-                              context), // بياخد الـ Cubit اللي شغال فعلاً
+                        builder: (context) => BlocProvider(
+                          create: (_) =>
+                              sl<CartCubit>(), // ✅ بدل BlocProvider.of
                           child: const CartScreen(),
                         ),
                       ),

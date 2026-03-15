@@ -16,7 +16,7 @@ class DetailsBottomActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
       ),
@@ -33,12 +33,14 @@ class DetailsBottomActions extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r)),
               ),
-              child: Text("إضافة للسلة",
-                  style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white)),
+              child: Text(
+                "إضافة للسلة",
+                style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
           ),
         ],

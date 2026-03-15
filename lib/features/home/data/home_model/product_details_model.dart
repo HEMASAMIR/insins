@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class ProductDetailsModel {
   final int id;
   final String nameAr;
@@ -27,12 +25,24 @@ class ProductDetailsModel {
     required this.reviews,
   });
 
+  // ✅ احسب متوسط التقييم
+  double get averageRating {
+    if (reviews.isEmpty) return 0.0;
+    double total = 0;
+    for (var review in reviews) {
+      total += (review['rating'] as num).toDouble();
+    }
+    return double.parse((total / reviews.length).toStringAsFixed(1));
+  }
+
+  // ✅ عدد التقييمات
+  int get reviewsCount => reviews.length;
+
   factory ProductDetailsModel.fromJson(Map<String, dynamic> json) {
     return ProductDetailsModel(
       id: json['id'],
       nameAr: json['nameAr'] ?? '',
       nameEn: json['nameEn'] ?? '',
-      // التعديل هنا: لو descriptionAr مش موجود في الـ JSON خليه ياخد nameAr
       descriptionAr: json['descriptionAr'] ?? json['nameAr'] ?? '',
       descriptionEn: json['descriptionEn'] ?? json['nameEn'] ?? '',
       notes: json['notes'],
@@ -43,17 +53,14 @@ class ProductDetailsModel {
       reviews: json['reviews'] ?? [],
     );
   }
+
   factory ProductDetailsModel.fromProductModel(dynamic product) {
     return ProductDetailsModel(
       id: product.id ?? 0,
-      // تعديل: جرب يقرأ name أو nameAr
       nameAr: product.nameAr ?? product.name ?? '',
       nameEn: product.nameEn ?? '',
       price: double.tryParse(product.price.toString()) ?? 0.0,
-      imageUrl:
-          product.imageUrl ?? product.image ?? '', // تعديل: image أو imageUrl
-
-      // التعديل الأهم للوصف
+      imageUrl: product.imageUrl ?? product.image ?? '',
       descriptionAr: _tryGetDescription(product),
       descriptionEn: '',
       stockQuantity: 1,
@@ -63,7 +70,6 @@ class ProductDetailsModel {
 
   static String _tryGetDescription(dynamic p) {
     try {
-      // جرب كل الاحتمالات اللي ممكن الـ API يبعتها
       return p.descriptionAr ??
           p.description ??
           p.content ??

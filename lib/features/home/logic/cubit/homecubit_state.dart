@@ -1,16 +1,13 @@
-import 'package:insins/features/home/data/home_model/home_data_model.dart';
+import 'package:insins/features/home/data/home_model/product_details_model.dart';
 
 abstract class ProductsState {}
 
 class ProductsInitial extends ProductsState {}
 
-// ══════════════════════════════════════════════════════════
-// Products States
-// ══════════════════════════════════════════════════════════
 class ProductsLoading extends ProductsState {}
 
 class ProductsLoaded extends ProductsState {
-  final List<ProductModel> products;
+  final List<ProductDetailsModel> products;
   ProductsLoaded(this.products);
 }
 

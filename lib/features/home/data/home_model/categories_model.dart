@@ -3,12 +3,14 @@ class SubCategoryModel {
   final String nameAr;
   final String nameEn;
   final String? imageUrl;
+  final List<dynamic> products; // يفضل استبدال dynamic بـ ProductModel لو موجود
 
   SubCategoryModel({
     required this.id,
     required this.nameAr,
     required this.nameEn,
     this.imageUrl,
+    this.products = const [],
   });
 
   factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,8 @@ class SubCategoryModel {
       nameAr: json['nameAr'] ?? '',
       nameEn: json['nameEn'] ?? '',
       imageUrl: json['imageUrl'],
+      // تعديل هنا: لو مش موجودة أو نال، خليها لستة فاضية []
+      products: (json['products'] as List<dynamic>?) ?? [],
     );
   }
 
@@ -25,6 +29,7 @@ class SubCategoryModel {
         'nameAr': nameAr,
         'nameEn': nameEn,
         'imageUrl': imageUrl,
+        'products': products,
       };
 }
 

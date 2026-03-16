@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/animation/slide_reveal_animation.dart';
-import 'package:insins/core/di/injection.dart';
 import 'package:insins/core/widgets/custom_menu.dart';
 import 'package:insins/core/widgets/drawer_item_widget.dart';
 import 'package:insins/core/widgets/language_selector_widget.dart';
-import 'package:insins/features/home/logic/cubit/homecubit_cubit.dart';
+import 'package:insins/features/home/logic/categories_cubit/cubit/categories_cubit.dart';
 import 'package:insins/features/home/presentaion/widget/custom_contact_button.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -31,16 +30,11 @@ class CustomDrawer extends StatelessWidget {
     onClose();
   }
 
-  // جوه CustomDrawer
   Future<void> _navigate(VoidCallback? action) async {
     await _animationKey.currentState?.reverse();
     await Future.delayed(const Duration(milliseconds: 30));
-
     onClose();
-
-    if (action != null) {
-      action();
-    }
+    if (action != null) action();
   }
 
   @override
@@ -69,36 +63,32 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   const Spacer(flex: 3),
-
                   DrawerItemWidget(
                     title: 'الرئيسية',
                     onTap: () => _navigate(onHomeTap),
                   ),
-
-                  // ✅ التعديل هنا: يروح لقسم "من نحن"
                   DrawerItemWidget(
                     title: 'من نحن',
                     onTap: () => _navigate(onAboutTap),
                   ),
-
                   DrawerItemWidget(
                     title: 'قسم العطور',
                     onTap: () {
+                      final cubit = context
+                          .read<CategorieCubit>(); // ✅ احفظه قبل الـ push
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CategoryMenuWidget(
-                            onCategorySelected: (categoryId, categoryName) {
-                              // 1. اقفل الـ CategoryMenu
-                              Navigator.pop(context);
-
-                              // 2. جيب الداتا
-                              sl<ProductsCubit>()
-                                  .fetchProductsByCategory(categoryId);
-
-                              // 3. ✅ اقفل الـ Drawer وروح لشاشة المتجر
-                              _navigate(onShopTap);
-                            },
+                          builder: (_) => BlocProvider.value(
+                            value: cubit,
+                            child: CategoryMenuWidget(
+                              onCategorySelected: (categoryId, categoryName) {
+                                cubit.selectCategory(categoryId); // ✅ فلترة
+                                if (Navigator.canPop(context))
+                                  // Navigator.pop(context);
+                                  _navigate(onShopTap); // ✅ يروح للمتجر
+                              },
+                            ),
                           ),
                         ),
                       );
@@ -109,7 +99,6 @@ class CustomDrawer extends StatelessWidget {
                     title: 'المتجر',
                     onTap: () => _navigate(onShopTap),
                   ),
-
                   const Spacer(flex: 2),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.h),

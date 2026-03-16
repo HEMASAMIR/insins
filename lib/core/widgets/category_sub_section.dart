@@ -15,7 +15,7 @@ class CategorySubSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Colors.white, // خلفية بيضاء
+      color: Colors.white,
       child: Column(
         children: items.map((item) {
           return InkWell(

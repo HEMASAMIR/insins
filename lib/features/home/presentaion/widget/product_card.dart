@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductCard extends StatelessWidget {
+  // يفضل دائماً تحديد النوع بدلاً من dynamic لتجنب الأخطاء مستقبلاً
   final dynamic product;
   final VoidCallback onTap;
 
@@ -9,6 +10,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // التعديل الجوهري هنا: الوصول للقيم عبر الخاصية مباشرة
+    // تأكد أن أسماء المتغيرات (imageUrl, nameAr) هي نفس الأسماء الموجودة داخل ProductDetailsModel
+    String imageUrl = product.imageUrl ?? '';
+    String title = product.nameAr ?? 'بدون عنوان';
+    String category = product.categoryName ?? '';
+
     return Container(
       margin: EdgeInsets.only(bottom: 30.h),
       width: double.infinity,
@@ -25,14 +32,14 @@ class ProductCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // 1. مساحة الصورة - واخدة الـ Border العلوي بس
+          // 1. مساحة الصورة
           ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(25.r)),
             child: Stack(
               children: [
                 Image.network(
-                  product.imageUrl ?? '',
-                  height: 380.h, // ارتفاع طولي زي الصورة بالظبط
+                  imageUrl,
+                  height: 380.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
@@ -41,12 +48,12 @@ class ProductCard extends StatelessWidget {
                     child: const Icon(Icons.broken_image, color: Colors.grey),
                   ),
                 ),
-                // الكلمة الصغيرة اللي فوق ع اليمين (متغيرة حسب القسم)
+                // التصنيف العلوي
                 Positioned(
                   top: 20.h,
                   right: 20.w,
                   child: Text(
-                    product.categoryName ?? '',
+                    category,
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.black,
@@ -59,26 +66,24 @@ class ProductCard extends StatelessWidget {
             ),
           ),
 
-          // 2. منطقة البيانات (تحت الصورة مباشرة)
+          // 2. منطقة البيانات
           Padding(
             padding: EdgeInsets.symmetric(vertical: 30.h, horizontal: 20.w),
             child: Column(
               children: [
-                // العنوان اللي أنت أكدت عليه (image_504d65.png)
                 Text(
-                  product.nameAr ??
-                      '', // بيجيب "عطور رجالية" أو غيره من الـ API
+                  title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24.sp,
-                    fontWeight: FontWeight.w900, // Bold جداً زي الصورة
+                    fontWeight: FontWeight.w900,
                     fontFamily: 'Cairo',
                     color: Colors.black,
                   ),
                 ),
                 SizedBox(height: 10.h),
 
-                // السطرين الثابتين اللي طلبتهم بالظبط
+                // الأسطر الثابتة
                 Text(
                   'العود الطبيعي',
                   textAlign: TextAlign.center,
@@ -101,7 +106,7 @@ class ProductCard extends StatelessWidget {
 
                 SizedBox(height: 30.h),
 
-                // زرار تسوق الآن (أسود بيضاوي)
+                // زرار تسوق الآن
                 SizedBox(
                   width: 190.w,
                   height: 55.h,

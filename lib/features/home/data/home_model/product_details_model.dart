@@ -55,27 +55,69 @@ class ProductDetailsModel {
   }
 
   factory ProductDetailsModel.fromProductModel(dynamic product) {
+    double parsedPrice = 0.0;
+    try {
+      parsedPrice = double.tryParse(product.price.toString()) ?? 0.0;
+    } catch (_) {
+      parsedPrice = 0.0;
+    }
+
+    String imageUrl = '';
+    try {
+      imageUrl = product.imageUrl ?? '';
+    } catch (_) {
+      imageUrl = '';
+    }
+
+    String nameAr = '';
+    try {
+      nameAr = product.nameAr ?? product.name ?? '';
+    } catch (_) {
+      nameAr = '';
+    }
+
+    String nameEn = '';
+    try {
+      nameEn = product.nameEn ?? '';
+    } catch (_) {
+      nameEn = '';
+    }
+
+    String descriptionAr = '';
+    try {
+      descriptionAr = product.descriptionAr ??
+          product.description ??
+          product.content ??
+          'وصف المنتج متاح في صفحة التفاصيل';
+    } catch (_) {
+      descriptionAr = 'الوصف غير متوفر حالياً';
+    }
+
+    String? categoryName;
+    try {
+      categoryName = product.categoryName;
+    } catch (_) {
+      categoryName = null;
+    }
+
+    int stockQuantity = 1;
+    try {
+      stockQuantity = product.stockQuantity ?? 1;
+    } catch (_) {
+      stockQuantity = 1;
+    }
+
     return ProductDetailsModel(
       id: product.id ?? 0,
-      nameAr: product.nameAr ?? product.name ?? '',
-      nameEn: product.nameEn ?? '',
-      price: double.tryParse(product.price.toString()) ?? 0.0,
-      imageUrl: product.imageUrl ?? product.image ?? '',
-      descriptionAr: _tryGetDescription(product),
+      nameAr: nameAr,
+      nameEn: nameEn,
+      price: parsedPrice,
+      imageUrl: imageUrl,
+      descriptionAr: descriptionAr,
       descriptionEn: '',
-      stockQuantity: 1,
+      stockQuantity: stockQuantity,
+      categoryName: categoryName,
       reviews: [],
     );
-  }
-
-  static String _tryGetDescription(dynamic p) {
-    try {
-      return p.descriptionAr ??
-          p.description ??
-          p.content ??
-          'وصف المنتج متاح في صفحة التفاصيل';
-    } catch (e) {
-      return 'الوصف غير متوفر حالياً';
-    }
   }
 }

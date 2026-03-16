@@ -4,9 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/constants/app_colors.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insins/core/widgets/custom_drawer.dart';
-import 'package:insins/core/widgets/whatsapp_helper.dart'; // ✅
+import 'package:insins/core/widgets/whatsapp_helper.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_state.dart';
+import 'package:insins/features/home/logic/categories_cubit/cubit/categories_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -56,7 +57,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ✅ استدعاء من WhatsAppHelper
                 GestureDetector(
                   onTap: () => WhatsAppHelper.call(),
                   child: Row(
@@ -108,11 +108,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       icon:
                           const Icon(Icons.menu, color: Colors.white, size: 30),
                       onPressed: onMenuOpen ??
-                          () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  opaque: false,
-                                  pageBuilder: (context, _, __) => Material(
+                          () {
+                            // ✅ احفظ الـ Cubit قبل الـ push
+                            final cubit = context.read<CategorieCubit>();
+
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                opaque: false,
+                                pageBuilder: (_, __, ___) => BlocProvider.value(
+                                  value: cubit, // ✅ مرره للـ route الجديد
+                                  child: Material(
                                     color: Colors.transparent,
                                     child: CustomDrawer(
                                       onClose: () => Navigator.of(context,
@@ -125,6 +131,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                   ),
                                 ),
                               ),
+                            );
+                          },
                     ),
                     const SizedBox(width: 10),
                     BlocBuilder<CartCubit, CartState>(

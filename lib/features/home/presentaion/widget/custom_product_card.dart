@@ -1,144 +1,160 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/constants/app_constants.dart';
 
 class ProductCardWidget extends StatelessWidget {
-  final String imageUrl;
-  final String category;
-  final String name;
-  final double price;
+  final dynamic product; // نمرر الموديل بالكامل لسهولة الaوصول للبيانات
+  final VoidCallback onTap;
   final VoidCallback onAddToCart;
-  final VoidCallback onTap; // ✅ أضفنا هذا السطر
 
   const ProductCardWidget({
     super.key,
-    required this.imageUrl,
-    required this.category,
-    required this.name,
-    required this.price,
+    required this.product,
+    required this.onTap,
     required this.onAddToCart,
-    required this.onTap, // ✅ أضفناه هنا أيضاً
   });
 
   @override
   Widget build(BuildContext context) {
-    final String fullImageUrl = "${AppConstants.baseUrl}/${imageUrl.trim()}";
+    // 1. منطق إصلاح الرابط وتنظيفه من أي مشاكل (عشان الـ Host Error)
+    String imagePath = product.imageUrl ?? '';
+    if (imagePath.startsWith('/')) {
+      imagePath = imagePath.substring(1);
+    }
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.07),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        // ✅ InkWell يجعل الكارت بالكامل (خاصة الصورة) قابلاً للضغط
-        child: InkWell(
-          onTap: onTap, // ينفذ الانتقال لصفحة التفاصيل
-          borderRadius: BorderRadius.circular(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ── صورة المنتج
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: CachedNetworkImage(
+    // دمج الـ Base URL مع المسار المنظف
+    final String fullImageUrl = "${AppConstants.baseUrl}/$imagePath";
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 30.h),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // ── منطقة الصورة (قابلة للضغط) ──
+          GestureDetector(
+            onTap: onTap,
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(25.r)),
+              child: Stack(
+                children: [
+                  CachedNetworkImage(
                     imageUrl: fullImageUrl,
-                    fit: BoxFit.contain,
+                    height: 380.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
+                      height: 380.h,
                       color: const Color(0xFFF5F0EB),
                       child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFFCCBB99),
-                          strokeWidth: 2,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
-                      color: const Color(0xFFF5F0EB),
-                      child: const Icon(Icons.image_not_supported,
-                          color: Color(0xFFCCBB99), size: 40),
+                      height: 380.h,
+                      color: Colors.grey[100],
+                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  ),
+                  // تصنيف القسم فوق الصورة
+                  Positioned(
+                    top: 20.h,
+                    right: 20.w,
+                    child: Text(
+                      product.nameAr ?? '',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── منطقة البيانات ──
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 30.h, horizontal: 20.w),
+            child: Column(
+              children: [
+                // اسم المنتج
+                Text(
+                  product.nameAr ?? 'بدون عنوان',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Cairo',
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 10.h),
+
+                // الأسطر الثابتة (العود الطبيعي / المحسن)
+                Text(
+                  'العود الطبيعي',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.grey[500],
+                    fontFamily: 'Cairo',
+                  ),
+                ),
+                SizedBox(height: 5.h),
+                Text(
+                  'العود المحسن',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.grey[500],
+                    fontFamily: 'Cairo',
+                  ),
+                ),
+
+                SizedBox(height: 30.h),
+
+                // زرار تسوق الآن
+                SizedBox(
+                  width: 190.w,
+                  height: 55.h,
+                  child: ElevatedButton(
+                    onPressed: onTap,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF111111),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(35.r),
+                      ),
+                    ),
+                    child: Text(
+                      'تسوق الآن',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo',
+                      ),
                     ),
                   ),
                 ),
-              ),
-
-              // ── بيانات المنتج
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                child: Column(
-                  children: [
-                    Text(category,
-                        style: const TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 11,
-                            color: Color(0xFF999999))),
-                    const SizedBox(height: 4),
-                    Text(
-                      name,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A0A00)),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('﷼',
-                            style: TextStyle(
-                                fontSize: 14, color: Color(0xFF333333))),
-                        const SizedBox(width: 4),
-                        Text(price.toStringAsFixed(2),
-                            style: const TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF333333))),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    // زر إضافة للسلة يظل يعمل بشكل مستقل
-                    SizedBox(
-                      width: double.infinity,
-                      height: 38,
-                      child: ElevatedButton.icon(
-                        onPressed: onAddToCart,
-                        icon: const Icon(Icons.shopping_cart, size: 16),
-                        label: const Text('إضافة للسلة',
-                            style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3CB371),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

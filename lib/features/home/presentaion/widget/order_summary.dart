@@ -35,7 +35,7 @@ class OrderSummary extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // عنوان ملخص الطلب
+          // ✅ عنوان ملخص الطلب - بقى جهة اليسار
           Align(
             alignment: Alignment.centerRight,
             child: Text(
@@ -53,21 +53,11 @@ class OrderSummary extends StatelessWidget {
           const Divider(thickness: 0.5, color: Color(0xFFEEEEEE)),
           SizedBox(height: 15.h),
 
-          // صف الإجمالي
+          // ✅ صف الإجمالي - عكسنا أماكن النصوص
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // السعر (يسار)
-              Text(
-                "SAR ${totalPrice.toStringAsFixed(0)}",
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF4B3425),
-                  fontFamily: 'Cairo',
-                ),
-              ),
-              // كلمة الإجمالي (يمين)
+              // كلمة الإجمالي (يسار)
               Text(
                 "الإجمالي:",
                 style: TextStyle(
@@ -75,6 +65,16 @@ class OrderSummary extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Cairo',
                   color: const Color(0xFF4B3425),
+                ),
+              ),
+              // السعر (يمين)
+              Text(
+                "SAR ${totalPrice.toStringAsFixed(0)}",
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w900,
+                  color: const Color(0xFF4B3425),
+                  fontFamily: 'Cairo',
                 ),
               ),
             ],
@@ -98,11 +98,11 @@ class OrderSummary extends StatelessWidget {
               children: [
                 Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
                 SizedBox(width: 10.w),
-                Text(
+                const Text(
                   "إتمام الطلب",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Cairo',
                   ),
@@ -113,29 +113,28 @@ class OrderSummary extends StatelessWidget {
 
           SizedBox(height: 15.h),
 
-          // زر العودة للمتجر
+          // زر العودة للمتجر - عكسنا اتجاه السهم كمان
           GestureDetector(
             onTap: onBackToShop,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                // السهم بقى في الأول عشان الحركة تبان عكس
+                Icon(Icons.arrow_back, color: AppColors.gold, size: 18.sp),
+                SizedBox(width: 5.w),
+                const Text(
                   "العودة للمتجر",
                   style: TextStyle(
                     color: AppColors.gold,
-                    fontSize: 15.sp,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Cairo',
                   ),
                 ),
-                SizedBox(width: 5.w),
-                Icon(Icons.arrow_forward, color: AppColors.gold, size: 18.sp),
               ],
             ),
           ),
-          SizedBox(
-            height: 60.h,
-          )
+          SizedBox(height: 60.h)
         ],
       ),
     );

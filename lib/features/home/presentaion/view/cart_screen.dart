@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/constants/app_colors.dart';
 import 'package:insins/core/di/injection.dart';
 import 'package:insins/core/widgets/cart_dialog.dart';
-import 'package:insins/core/widgets/custom_app_bar.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_state.dart';
 import 'package:insins/features/home/presentaion/widget/custom_footer.dart';
@@ -19,10 +18,10 @@ class CartScreen extends StatelessWidget {
     return BlocProvider.value(
       value: sl<CartCubit>(),
       child: Directionality(
-        textDirection: TextDirection.ltr,
+        textDirection:
+            TextDirection.rtl, // ✅ اتصلحت هنا عشان الصورة يمين والكلام شمال
         child: Scaffold(
           backgroundColor: const Color(0xFFFBFBFB),
-          appBar: CustomAppBar(),
           body: BlocBuilder<CartCubit, CartState>(
             builder: (context, state) {
               if (state is CartLoading) {
@@ -113,7 +112,7 @@ class CartScreen extends StatelessWidget {
   Widget _buildHeader() {
     return Padding(
       padding: EdgeInsets.only(
-        top: kToolbarHeight + 120.h, // ✅ عشان ميتغطاش بالـ AppBar
+        top: kToolbarHeight + 120.h,
         bottom: 20.h,
         left: 16.w,
         right: 16.w,
@@ -144,6 +143,7 @@ class CartScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // 1. الصورة (بقت أقصى اليمين)
           Container(
             width: 80.w,
             height: 80.w,
@@ -161,6 +161,7 @@ class CartScreen extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12.w),
+          // 2. الداتا (في النص)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,6 +182,7 @@ class CartScreen extends StatelessWidget {
               ],
             ),
           ),
+          // 3. زرار الحذف (أقصى الشمال)
           GestureDetector(
             onTap: () async {
               bool? confirm = await CartDialogs.showDeleteConfirmation(context);

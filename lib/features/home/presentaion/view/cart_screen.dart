@@ -7,7 +7,8 @@ import 'package:insins/core/widgets/cart_dialog.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_state.dart';
 import 'package:insins/features/home/presentaion/widget/custom_footer.dart';
-import 'package:insins/features/home/presentaion/widget/order_summary.dart';
+import 'package:insins/features/shipping/logic/shipping_cubit/cubit/shipping_cubit.dart';
+import 'package:insins/features/shipping/presentation/view/order_summary.dart';
 
 class CartScreen extends StatelessWidget {
   final VoidCallback? onBackToShop;
@@ -15,11 +16,20 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: sl<CartCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        // استخدام .value للـ CartCubit لأنه غالباً شغال من الصفحات اللي قبلها
+        BlocProvider.value(value: sl<CartCubit>()..loadCart()),
+
+        // 💡 هنا السر: إنشاء الـ ShippingCubit وطلب الداتا فوراً
+        // استخدام lazy: false بيجبر الكيوبيت يشتغل أول ما السكرين تفتح
+        BlocProvider(
+          create: (context) => sl<ShippingCubit>()..fetchCities(),
+          lazy: false,
+        ),
+      ],
       child: Directionality(
-        textDirection:
-            TextDirection.rtl, // ✅ اتصلحت هنا عشان الصورة يمين والكلام شمال
+        textDirection: TextDirection.rtl,
         child: Scaffold(
           backgroundColor: const Color(0xFFFBFBFB),
           body: BlocBuilder<CartCubit, CartState>(
@@ -58,9 +68,11 @@ class CartScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 50.h),
+
+          // 💡 التعديل هنا: نمرر الـ Cubit من الـ context الحالي وليس من الـ sl مباشرة
+          // عشان نضمن إن الـ OrderSummary شايف النسخة اللي عملنا لها fetchCities
           OrderSummary(
             totalPrice: state.totalPrice,
-            onCheckout: () {},
             onBackToShop: () {
               if (onBackToShop != null) {
                 onBackToShop!();
@@ -68,6 +80,7 @@ class CartScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
+            shippingCubit: context.read<ShippingCubit>(),
           ),
           const FooterWidget(),
         ],
@@ -112,11 +125,7 @@ class CartScreen extends StatelessWidget {
   Widget _buildHeader() {
     return Padding(
       padding: EdgeInsets.only(
-        top: kToolbarHeight + 120.h,
-        bottom: 20.h,
-        left: 16.w,
-        right: 16.w,
-      ),
+          top: kToolbarHeight + 120.h, bottom: 20.h, left: 16.w, right: 16.w),
       child: Align(
         alignment: Alignment.centerRight,
         child: Text(
@@ -143,7 +152,6 @@ class CartScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 1. الصورة (بقت أقصى اليمين)
           Container(
             width: 80.w,
             height: 80.w,
@@ -161,7 +169,6 @@ class CartScreen extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12.w),
-          // 2. الداتا (في النص)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +189,6 @@ class CartScreen extends StatelessWidget {
               ],
             ),
           ),
-          // 3. زرار الحذف (أقصى الشمال)
           GestureDetector(
             onTap: () async {
               bool? confirm = await CartDialogs.showDeleteConfirmation(context);

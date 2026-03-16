@@ -1,10 +1,16 @@
 import 'package:get_it/get_it.dart';
+import 'package:insins/features/checkout/data/checkout_repo/checkout_repo.dart';
+import 'package:insins/features/checkout/data/checkout_repo/checkout_repo_impl.dart';
+import 'package:insins/features/checkout/logic/cubit/checkout_cubit.dart';
 import 'package:insins/features/home/data/home_repo/add_review_repo/add_review_repo.dart';
 import 'package:insins/features/home/data/home_repo/add_review_repo/add_review_repo_impl.dart';
 import 'package:insins/features/home/data/home_repo/cart_repo/cart_repo.dart';
 import 'package:insins/features/home/data/home_repo/cart_repo/cart_repo_impl.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/presentaion/add_review/logic/add_review_cubit/addreview_cubit.dart';
+import 'package:insins/features/shipping/data/shipping_repos/hipping_reppo_impl.dart';
+import 'package:insins/features/shipping/data/shipping_repos/shipping_repo.dart';
+import 'package:insins/features/shipping/logic/shipping_cubit/cubit/shipping_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:insins/core/networking/dio_client.dart';
 import 'package:insins/features/home/data/home_repo/categories_repo/categories_repo.dart';
@@ -40,6 +46,12 @@ Future<void> setupDI() async {
   sl.registerLazySingleton<AddReviewRepo>(
     () => AddReviewRepoImpl(DioHelper.dio!),
   );
+  sl.registerLazySingleton<ShippingRepository>(
+    () => ShippingRepositoryImpl(DioHelper.dio!),
+  );
+  sl.registerLazySingleton<CheckoutRepository>(
+    () => CheckoutRepositoryImpl(DioHelper.dio!),
+  );
 
   // ── Cubits ───────────────────────────────────────────
   sl.registerLazySingleton(() => ProductsCubit(sl()));
@@ -47,4 +59,6 @@ Future<void> setupDI() async {
   sl.registerFactory(() => ProductDetailsCubit(sl()));
   sl.registerLazySingleton(() => CartCubit(sl<CartRepo>()));
   sl.registerFactory(() => AddReviewCubit(sl()));
+  sl.registerFactory(() => ShippingCubit(sl()));
+  sl.registerFactory(() => CheckoutCubit(sl()));
 }

@@ -14,6 +14,7 @@ import 'package:insins/features/home/presentaion/view/home.dart';
 import 'package:insins/features/home/presentaion/view/policy_page.dart';
 import 'package:insins/features/home/data/home_model/product_details_model.dart';
 import 'package:insins/features/home/presentaion/widget/details_product_card.dart';
+import 'package:insins/features/shipping/logic/shipping_cubit/cubit/shipping_cubit.dart';
 
 class RouterGenerationConfig {
   static GoRouter goRouter = GoRouter(
@@ -40,16 +41,17 @@ class RouterGenerationConfig {
           final product = state.extra as ProductDetailsModel;
           return MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context) => sl<AddReviewCubit>()),
-              BlocProvider.value(value: sl<CartCubit>()),
-              BlocProvider.value(value: sl<ProductDetailsCubit>()),
+              BlocProvider(create: (_) => sl<AddReviewCubit>()),
+              BlocProvider(create: (_) => sl<CartCubit>()..loadCart()),
+              BlocProvider(create: (_) => sl<ProductDetailsCubit>()),
+              BlocProvider(create: (_) => sl<ShippingCubit>()..fetchCities()),
             ],
             child: DetailsProductCard(
               product: product,
               onBack: () => context.pop(),
               onTap: (p) {},
-              onGoToShop: () => context.go(AppRoutes.homeScreen), // ✅
-              onGoToCart: () => context.go(AppRoutes.cartScreen), // ✅
+              onGoToShop: () => context.go(AppRoutes.homeScreen),
+              onGoToCart: () => context.go(AppRoutes.cartScreen),
             ),
           );
         },
@@ -73,7 +75,7 @@ class RouterGenerationConfig {
           return MultiBlocProvider(
             providers: [
               BlocProvider(create: (_) => sl<ProductDetailsCubit>()),
-              BlocProvider.value(value: sl<CartCubit>()),
+              BlocProvider(create: (_) => sl<CartCubit>()..loadCart()),
             ],
             child: CategoryDetailsPage(
               category: category,
@@ -86,8 +88,14 @@ class RouterGenerationConfig {
       GoRoute(
         name: AppRoutes.cartScreen,
         path: AppRoutes.cartScreen,
-        builder: (context, state) => BlocProvider.value(
-          value: sl<CartCubit>(),
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: sl<CartCubit>()),
+            // ✅ create مش value عشان يعمل instance جديد ويشغل fetchCities
+            BlocProvider(
+              create: (_) => sl<ShippingCubit>()..fetchCities(),
+            ),
+          ],
           child: CartScreen(
             onBackToShop: () => context.go(AppRoutes.homeScreen),
           ),

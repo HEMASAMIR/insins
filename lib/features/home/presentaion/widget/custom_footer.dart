@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insins/core/di/injection.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/presentaion/view/policy_page.dart';
+import 'package:insins/features/shipping/presentation/view/shipping_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:insins/features/home/presentaion/view/cart_screen.dart'; // تأكد من مسار صفحة السلة عندك
 
@@ -101,7 +102,14 @@ class FooterWidget extends StatelessWidget {
                       ),
                     );
                   }),
-                  _link('معلومات الشحن', () {}),
+                  _link('معلومات الشحن', () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ShippingScreen(),
+                      ),
+                    );
+                  }),
                   _link('السياسات', () {
                     log("Navigate to PolicyScreen");
                     Navigator.push(

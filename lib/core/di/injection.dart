@@ -56,7 +56,7 @@ Future<void> setupDI() async {
   // ── Cubits ───────────────────────────────────────────
   sl.registerLazySingleton(() => ProductsCubit(sl()));
   sl.registerFactory(() => CategorieCubit(sl()));
-  sl.registerFactory(() => ProductDetailsCubit(sl()));
+  sl.registerLazySingleton(() => ProductDetailsCubit(sl()));
   sl.registerLazySingleton(() => CartCubit(sl<CartRepo>()));
   sl.registerFactory(() => AddReviewCubit(sl()));
   sl.registerFactory(() => ShippingCubit(sl()));

@@ -12,12 +12,12 @@ class DetailsProductImage extends StatelessWidget {
     final String fullUrl = Uri.encodeFull("https://incense-sa.com/$imageUrl");
 
     return Container(
-      width: double.infinity,
+      width: double.infinity, // الحاوية واخدة العرض كله أصلاً
       height: 300.h,
       color: const Color(0xFFFBFBFB),
       child: CachedNetworkImage(
         imageUrl: fullUrl,
-        fit: BoxFit.contain,
+        fit: BoxFit.cover,
         placeholder: (context, url) => const Center(
           child: CircularProgressIndicator(
             strokeWidth: 2,

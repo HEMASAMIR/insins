@@ -15,6 +15,14 @@ class VerticalProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🛡️ خط الدفاع الأول: لو المنتج null، اظهر أي حاجة تانية بدل الانهيار
+    if (product == null) {
+      return const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -34,13 +42,13 @@ class VerticalProductCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 1. الصورة في المنتصف
+            // 1. الصورة
             ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(15.r)),
               child: AspectRatio(
                 aspectRatio: 1.1,
                 child: Image.network(
-                  "https://incense-sa.com/${product.imageUrl}",
+                  "https://incense-sa.com/${product.imageUrl ?? ''}",
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => Icon(
                     Icons.image_not_supported,
@@ -55,9 +63,9 @@ class VerticalProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // 2. الاسم في المنتصف
+                  // 2. الاسم (استخدمنا ? قبل النقطة للتأمين)
                   Text(
-                    product.nameAr ?? '',
+                    product.nameAr ?? 'اسم غير متوفر',
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -69,9 +77,9 @@ class VerticalProductCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  // 3. السعر في المنتصف
+                  // 3. السعر
                   Text(
-                    "${product.price} ر.س",
+                    "${product.price ?? 0} ر.س",
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w900,
@@ -80,12 +88,12 @@ class VerticalProductCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 15.h),
-                  // 4. زر الإضافة (واخد العرض كله)
+                  // 4. زر الإضافة
                   SizedBox(
                     width: double.infinity,
                     height: 45.h,
                     child: ElevatedButton.icon(
-                      onPressed: onAdd, // هنا بينفذ إضافة للسلة بس
+                      onPressed: onAdd,
                       icon: Icon(Icons.add_shopping_cart,
                           color: Colors.white, size: 18.sp),
                       label: Text(

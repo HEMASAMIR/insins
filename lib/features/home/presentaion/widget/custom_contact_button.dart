@@ -48,24 +48,25 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ✅ زر الواتساب
+          // ✅ زر الواتساب مع Pulse Animation
           ScaleTransition(
             scale: _scaleAnimation,
             child: _buildCircleBtn(
               icon: FontAwesomeIcons.whatsapp,
-              onTap: () => WhatsAppHelper.sendGeneralMessage(), // ✅
+              onTap: () => WhatsAppHelper.sendGeneralMessage(),
               bgColor: const Color(0xFF25D366),
               isMain: true,
             ),
           ),
 
-          SizedBox(height: 15.h),
+          SizedBox(height: 16.h),
 
           // ✅ زر الاتصال
           _buildCircleBtn(
             icon: Icons.phone,
-            onTap: () => WhatsAppHelper.call(), // ✅
-            bgColor: const Color(0xFF9E9E9E).withOpacity(0.9),
+            onTap: () => WhatsAppHelper.call(),
+            bgColor:
+                const Color(0xFF333333).withOpacity(0.85), // لون أغمق وأشيك
             isMain: false,
           ),
         ],
@@ -82,16 +83,16 @@ class _QuickContactButtonsState extends State<QuickContactButtons>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: isMain ? 54.w : 45.w,
-        height: isMain ? 54.w : 45.w,
+        width: isMain ? 56.w : 48.w,
+        height: isMain ? 56.w : 48.w,
         decoration: BoxDecoration(
           color: bgColor,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
           ],
         ),

@@ -6,7 +6,6 @@ import 'package:insins/core/widgets/whatsapp_helper.dart';
 import 'package:insins/features/home/data/cart_model/cart_model.dart';
 import 'package:insins/features/home/logic/cart_cubit/cubit/cart_cubit.dart';
 import 'package:insins/features/home/presentaion/widget/details_bottom_actions.dart';
-import 'package:insins/features/home/presentaion/widget/details_header.dart';
 import 'package:insins/features/home/presentaion/widget/details_product_image.dart';
 import 'package:insins/features/home/presentaion/widget/details_product_info.dart';
 import 'package:insins/features/home/presentaion/presentation/view/details_reviews_section.dart';
@@ -35,30 +34,36 @@ class DetailsProductCard extends StatelessWidget {
       color: Colors.white,
       child: Column(
         children: [
-          SizedBox(height: 20.h),
-          DetailsHeader(onBack: onBack),
+          // 1. شيلنا DetailsHeader خالص عشان زرار الرجوع يختفي تماماً
+          SizedBox(height: MediaQuery.of(context).padding.top + 10.h),
+
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
+                  // 2. عرض الصورة مباشرة
                   DetailsProductImage(imageUrl: product.imageUrl ?? ""),
+
                   DetailsProductInfo(
                     name: product.nameAr,
                     price: product.price.toString(),
                     description: product.descriptionAr,
                   ),
+
                   DetailsReviewsSection(
                     productId: product.id,
                     averageRating: product.averageRating,
                     reviewsCount: product.reviewsCount,
                   ),
+
                   SizedBox(height: 40.h),
-                  const FooterWidget(), // ✅
+                  const FooterWidget(),
                 ],
               ),
             ),
           ),
+
           DetailsBottomActions(
             onAddToCart: () {
               context.read<CartCubit>().addToCart(

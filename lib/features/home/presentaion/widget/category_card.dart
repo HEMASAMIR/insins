@@ -6,8 +6,14 @@ import 'package:insins/features/home/data/home_model/categories_model.dart';
 
 class CategoryCard extends StatelessWidget {
   final CategoryModel category;
-  final VoidCallback onExploreTap;
-  const CategoryCard(this.category, {super.key, required this.onExploreTap});
+  final Function(dynamic)
+      onExploreTap; // غيرنا النوع هنا عشان يستقبل القسم الفرعي
+
+  const CategoryCard(
+    this.category, {
+    super.key,
+    required this.onExploreTap,
+  });
 
   String? _resolveImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) return null;
@@ -16,97 +22,120 @@ class CategoryCard extends StatelessWidget {
   }
 
   Widget _placeholder() => Container(
-        color: const Color(0xFFF5F5F5),
+        color: const Color(0xFFF9F9F9),
         child: Center(
           child:
-              Icon(Icons.image_outlined, size: 48.sp, color: Colors.grey[300]),
+              Icon(Icons.image_outlined, size: 24.sp, color: Colors.grey[300]),
         ),
       );
 
-  Widget _buildImage(String? url) {
+  Widget _buildLeadingImage(String? url) {
     final resolved = _resolveImage(url);
-    if (resolved == null) return _placeholder();
-    return CachedNetworkImage(
-      imageUrl: resolved,
-      fit: BoxFit.cover,
-      placeholder: (_, __) => const ColoredBox(color: Color(0xFFF9F9F9)),
-      errorWidget: (_, __, ___) => _placeholder(),
+    return Container(
+      width: 55.w,
+      height: 55.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: const Color(0xFFF0F0F0)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.r),
+        child: resolved == null
+            ? _placeholder()
+            : CachedNetworkImage(
+                imageUrl: resolved,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => _placeholder(),
+                errorWidget: (_, __, ___) => _placeholder(),
+              ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 12.h, left: 16.w, right: 16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFE8E8E8)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // ── الصورة ─────────────────────────────────
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: SizedBox(
-                height: 260.h,
-                width: double.infinity,
-                child: _buildImage(category.imageUrl),
-              ),
-            ),
-          ),
-
-          Divider(height: 1, color: const Color(0xFFE8E8E8)),
-
-          // ── الاسم + استكشف ──────────────────────────
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  category.nameAr,
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'Cairo',
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-
-                // ── onTap → ProductsListScreen ──────────
-                InkWell(
-                  // هنا بننادي على الدالة اللي استلمناها في الـ Constructor
-                  onTap: onExploreTap,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.arrow_back,
-                        size: 14.sp,
-                        color: Colors.grey[400],
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'استكشف المجموعة',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontFamily: 'Cairo',
-                          color: Colors.grey[400],
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+        borderRadius: BorderRadius.circular(15.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Theme(
+        // عشان نشيل الخطوط اللي بتظهر تلقائياً في الـ ExpansionTile
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+
+          // ── القسم الرئيسي (Leading على اليمين عشان العربي) ──
+          leading: _buildLeadingImage(category.imageUrl),
+
+          // ── اسم القسم ──
+          title: Text(
+            category.nameAr,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w800,
+              fontFamily: 'Cairo',
+              color: const Color(0xFF4A1D1D),
+            ),
+          ),
+
+          // ── السهم ──
+          trailing: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.grey[400],
+            size: 24.sp,
+          ),
+
+          // ── الأقسام الفرعية (تظهر تحت بعض بالطول) ──
+          children: category.subCategories.map((sub) {
+            return Column(
+              children: [
+                const Divider(height: 1, color: Color(0xFFF5F5F5)),
+                ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 24.w),
+                  onTap: () => onExploreTap(sub),
+                  title: Text(
+                    sub.nameAr,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: 'Cairo',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'استكشف المجموعة ←',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontFamily: 'Cairo',
+                      color: Colors.grey[400],
+                    ),
+                  ),
+                  // صورة مصغرة جداً للقسم الفرعي لو موجودة
+                  trailing: sub.imageUrl != null
+                      ? CircleAvatar(
+                          radius: 15.r,
+                          backgroundColor: const Color(0xFFF9F9F9),
+                          backgroundImage:
+                              NetworkImage(_resolveImage(sub.imageUrl) ?? ''),
+                        )
+                      : null,
+                ),
+              ],
+            );
+          }).toList(),
+        ),
       ),
     );
   }

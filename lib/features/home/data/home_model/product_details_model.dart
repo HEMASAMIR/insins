@@ -1,3 +1,5 @@
+import 'package:insins/features/home/data/cart_model/cart_model.dart';
+
 class ProductDetailsModel {
   final int id;
   final String nameAr;
@@ -25,7 +27,17 @@ class ProductDetailsModel {
     required this.reviews,
   });
 
-  // ✅ احسب متوسط التقييم
+  // ✅ وظيفة تحويل لمنتج السلة (تستخدمها في onAdd)
+  CartItemModel toCartItem() {
+    return CartItemModel(
+      id: id.toString(),
+      name: nameAr,
+      price: price,
+      image: imageUrl ?? '',
+      quantity: 1,
+    );
+  }
+
   double get averageRating {
     if (reviews.isEmpty) return 0.0;
     double total = 0;
@@ -35,18 +47,17 @@ class ProductDetailsModel {
     return double.parse((total / reviews.length).toStringAsFixed(1));
   }
 
-  // ✅ عدد التقييمات
   int get reviewsCount => reviews.length;
 
   factory ProductDetailsModel.fromJson(Map<String, dynamic> json) {
     return ProductDetailsModel(
-      id: json['id'],
+      id: json['id'] ?? 0,
       nameAr: json['nameAr'] ?? '',
       nameEn: json['nameEn'] ?? '',
       descriptionAr: json['descriptionAr'] ?? json['nameAr'] ?? '',
       descriptionEn: json['descriptionEn'] ?? json['nameEn'] ?? '',
       notes: json['notes'],
-      price: (json['price'] as num).toDouble(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       stockQuantity: json['stockQuantity'] ?? 0,
       imageUrl: json['imageUrl'],
       categoryName: json['categoryName'],
@@ -55,68 +66,18 @@ class ProductDetailsModel {
   }
 
   factory ProductDetailsModel.fromProductModel(dynamic product) {
-    double parsedPrice = 0.0;
-    try {
-      parsedPrice = double.tryParse(product.price.toString()) ?? 0.0;
-    } catch (_) {
-      parsedPrice = 0.0;
-    }
-
-    String imageUrl = '';
-    try {
-      imageUrl = product.imageUrl ?? '';
-    } catch (_) {
-      imageUrl = '';
-    }
-
-    String nameAr = '';
-    try {
-      nameAr = product.nameAr ?? product.name ?? '';
-    } catch (_) {
-      nameAr = '';
-    }
-
-    String nameEn = '';
-    try {
-      nameEn = product.nameEn ?? '';
-    } catch (_) {
-      nameEn = '';
-    }
-
-    String descriptionAr = '';
-    try {
-      descriptionAr = product.descriptionAr ??
-          product.description ??
-          product.content ??
-          'وصف المنتج متاح في صفحة التفاصيل';
-    } catch (_) {
-      descriptionAr = 'الوصف غير متوفر حالياً';
-    }
-
-    String? categoryName;
-    try {
-      categoryName = product.categoryName;
-    } catch (_) {
-      categoryName = null;
-    }
-
-    int stockQuantity = 1;
-    try {
-      stockQuantity = product.stockQuantity ?? 1;
-    } catch (_) {
-      stockQuantity = 1;
-    }
-
+    // كود التحويل كما هو مع تأمين القيم
     return ProductDetailsModel(
       id: product.id ?? 0,
-      nameAr: nameAr,
-      nameEn: nameEn,
-      price: parsedPrice,
-      imageUrl: imageUrl,
-      descriptionAr: descriptionAr,
+      nameAr: product.nameAr ?? product.name ?? '',
+      nameEn: product.nameEn ?? '',
+      price: double.tryParse(product.price.toString()) ?? 0.0,
+      imageUrl: product.imageUrl,
+      descriptionAr:
+          product.descriptionAr ?? 'وصف المنتج متاح في صفحة التفاصيل',
       descriptionEn: '',
-      stockQuantity: stockQuantity,
-      categoryName: categoryName,
+      stockQuantity: product.stockQuantity ?? 1,
+      categoryName: product.categoryName,
       reviews: [],
     );
   }

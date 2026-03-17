@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class LanguageSelectorWidget extends StatefulWidget {
   final String languageName;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const LanguageSelectorWidget({
     super.key,
     this.languageName = 'English',
-    required this.onTap,
+    this.onTap,
   });
 
   @override
@@ -22,14 +22,39 @@ class _LanguageSelectorWidgetState extends State<LanguageSelectorWidget>
   @override
   void initState() {
     super.initState();
-    // إعداد أنيميشن النبض (Pulse)
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
-    )..repeat(reverse: true); // يكرر الأنيميشن رايح جاي
+    )..repeat(reverse: true);
 
     _animation = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  void _showComingSoonSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.white),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'هذه الميزة ستكون متوفرة في الإصدار القادم إن شاء الله',
+                style:
+                    TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF4A1D1D),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
@@ -44,14 +69,17 @@ class _LanguageSelectorWidgetState extends State<LanguageSelectorWidget>
     return ScaleTransition(
       scale: _animation,
       child: InkWell(
-        onTap: widget.onTap,
+        onTap: () {
+          _showComingSoonSnackBar(context);
+          if (widget.onTap != null) widget.onTap!();
+        },
+        borderRadius: BorderRadius.circular(8),
         child: Container(
-          // جعل الزرار يأخذ العرض المتاح كاملاً
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF333333), // اللون الرمادي الفخم
-            borderRadius: BorderRadius.circular(8), // حواف خفيفة زي الصورة
+            color: const Color(0xFF333333),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

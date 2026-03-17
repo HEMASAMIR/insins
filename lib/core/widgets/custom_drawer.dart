@@ -74,8 +74,7 @@ class CustomDrawer extends StatelessWidget {
                   DrawerItemWidget(
                     title: 'قسم العطور',
                     onTap: () {
-                      final cubit = context
-                          .read<CategorieCubit>(); // ✅ احفظه قبل الـ push
+                      final cubit = context.read<CategorieCubit>();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -83,10 +82,8 @@ class CustomDrawer extends StatelessWidget {
                             value: cubit,
                             child: CategoryMenuWidget(
                               onCategorySelected: (categoryId, categoryName) {
-                                cubit.selectCategory(categoryId); // ✅ فلترة
-                                if (Navigator.canPop(context))
-                                  // Navigator.pop(context);
-                                  _navigate(onShopTap); // ✅ يروح للمتجر
+                                cubit.selectCategory(categoryId);
+                                _navigate(onShopTap);
                               },
                             ),
                           ),
@@ -100,9 +97,11 @@ class CustomDrawer extends StatelessWidget {
                     onTap: () => _navigate(onShopTap),
                   ),
                   const Spacer(flex: 2),
+                  // ─── زر اللغة هنا ────────────────────────
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.h),
-                    child: LanguageSelectorWidget(onTap: () {}),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: const LanguageSelectorWidget(),
+                    // سيبناها فاضية عشان الـ Widget جواه الـ Logic بتاعه
                   ),
                   const Spacer(flex: 2),
                   SizedBox(height: 80.h),

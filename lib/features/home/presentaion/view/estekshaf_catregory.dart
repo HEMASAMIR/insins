@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart'; // مهم جداً للـ push
+import 'package:go_router/go_router.dart';
 import 'package:insins/core/router/routes.dart';
 import 'package:insins/features/home/data/cart_model/cart_model.dart';
 import 'package:insins/features/home/data/home_model/categories_model.dart';
@@ -36,6 +36,17 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
         .getProductsByCategoryId(widget.category.id);
   }
 
+  // ✅ لما الـ category تتغير يعمل fetch جديد
+  @override
+  void didUpdateWidget(covariant CategoryDetailsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.category.id != widget.category.id) {
+      context
+          .read<ProductDetailsCubit>()
+          .getProductsByCategoryId(widget.category.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,12 +57,23 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
             _buildHeader(context),
             Expanded(
               child: BlocBuilder<ProductDetailsCubit, ProductDetailsState>(
+                // ✅ بنجبره يقرأ من النسخة اللي في الـ Memory عشان لو الـ Context اتهز وأنت راجع
+                bloc: context.read<ProductDetailsCubit>(),
+                buildWhen: (previous, current) {
+                  // ✅ بنقوله "اثبت مكانك" وما تعملش Rebuild للبياض
+                  // فقط لو الحالة فيها داتا أو تحميل أو خطأ
+                  return current is ProductDetailsLoaded ||
+                      current is ProductDetailsLoading ||
+                      current is ProductDetailsError;
+                },
                 builder: (context, state) {
                   if (state is ProductDetailsLoading) {
                     return const Center(
                         child: CircularProgressIndicator(
                             color: Color(0xFF2DBB54)));
-                  } else if (state is ProductDetailsLoaded) {
+                  }
+
+                  if (state is ProductDetailsLoaded) {
                     if (state.products.isEmpty) return _buildEmptyState();
 
                     return ListView.builder(
@@ -79,24 +101,18 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                                 image: currentProduct.imageUrl.toString(),
                                 quantity: 1,
                               );
-
                               context.read<CartCubit>().addToCart(cartItem);
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                      "تم إضافة ${currentProduct.nameAr} للسلة",
-                                      style:
-                                          const TextStyle(fontFamily: 'Cairo')),
+                                      "تم إضافة ${currentProduct.nameAr} للسلة"),
                                   backgroundColor: Colors.green,
                                   duration: const Duration(seconds: 1),
                                 ),
                               );
                             },
                             onTap: () {
-                              // ✅ تم التعديل هنا لاستخدام GoRouter
-                              // ده هيحل مشكلة الـ ProviderNotFoundException
-                              // وهيحل مشكلة الـ AssertionError عند الـ Back
                               context.push(
                                 AppRoutes.productDetailsScreen,
                                 extra: currentProduct,
@@ -106,10 +122,13 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                         );
                       },
                     );
-                  } else if (state is ProductDetailsError) {
+                  }
+
+                  if (state is ProductDetailsError) {
                     return Center(child: Text("خطأ: ${state.message}"));
                   }
-                  return const SizedBox();
+
+                  return const SizedBox.shrink();
                 },
               ),
             ),
@@ -136,7 +155,11 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
         children: [
           IconButton(
             onPressed: widget.onBack,
-            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              size: 20,
+              color: Colors.green,
+            ),
           ),
           Expanded(
             child: Text(

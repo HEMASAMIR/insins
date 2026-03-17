@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:insins/core/di/injection.dart';
@@ -20,20 +21,21 @@ class RouterGenerationConfig {
   static GoRouter goRouter = GoRouter(
     initialLocation: AppRoutes.homeScreen,
     routes: [
+      // ── الصفحة الرئيسية ──────────────────────────────────────────
       GoRoute(
         name: AppRoutes.homeScreen,
         path: AppRoutes.homeScreen,
         builder: (context, state) => MultiBlocProvider(
           providers: [
-            BlocProvider(create: (_) => sl<ProductsCubit>()..fetchProducts()),
-            BlocProvider(
-                create: (_) => sl<CategorieCubit>()..fetchCategories()),
-            BlocProvider(create: (_) => sl<ProductDetailsCubit>()),
-            BlocProvider(create: (_) => sl<CartCubit>()..loadCart()),
+            BlocProvider.value(value: sl<ProductsCubit>()..fetchProducts()),
+            BlocProvider.value(value: sl<CategorieCubit>()..fetchCategories()),
+            BlocProvider.value(value: sl<CartCubit>()..loadCart()),
           ],
           child: const LuxuryHomePage(),
         ),
       ),
+
+      // ── صفحة تفاصيل المنتج (تم تعديل الـ Providers هنا) ───────────────
       GoRoute(
         name: AppRoutes.productDetailsScreen,
         path: AppRoutes.productDetailsScreen,
@@ -41,9 +43,11 @@ class RouterGenerationConfig {
           final product = state.extra as ProductDetailsModel;
           return MultiBlocProvider(
             providers: [
+              // ✅ استخدم .value للـ Cubits الثابتة عشان متقفلش لما ترجع
+              BlocProvider.value(value: sl<ProductDetailsCubit>()),
+              BlocProvider.value(value: sl<CartCubit>()),
+              // factory cubits ممكن نستخدم create عادي
               BlocProvider(create: (_) => sl<AddReviewCubit>()),
-              BlocProvider(create: (_) => sl<CartCubit>()..loadCart()),
-              BlocProvider(create: (_) => sl<ProductDetailsCubit>()),
               BlocProvider(create: (_) => sl<ShippingCubit>()..fetchCities()),
             ],
             child: DetailsProductCard(
@@ -56,50 +60,54 @@ class RouterGenerationConfig {
           );
         },
       ),
-      GoRoute(
-        name: AppRoutes.policyScreen,
-        path: AppRoutes.policyScreen,
-        builder: (context, state) {
-          final cartCubit = state.extra as CartCubit;
-          return BlocProvider.value(
-            value: cartCubit,
-            child: const PolicyScreen(),
-          );
-        },
-      ),
+
+      // ── صفحة تفاصيل القسم (Category) ─────────────────────────────
       GoRoute(
         name: AppRoutes.categoryDetails,
         path: AppRoutes.categoryDetails,
         builder: (context, state) {
           final category = state.extra as CategoryModel;
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (_) => sl<ProductDetailsCubit>()),
-              BlocProvider(create: (_) => sl<CartCubit>()..loadCart()),
-            ],
+          // ✅ استخدمنا .value وجبنا الـ instance من GetIt مباشرة
+          // ده بيضمن إن الـ BlocBuilder اللي جوه الصفحة هيشوف دايما النسخة "الحية"
+          return BlocProvider.value(
+            value: sl<ProductDetailsCubit>(),
             child: CategoryDetailsPage(
               category: category,
               onProductTap: (p) {},
-              onBack: () {},
+              onBack: () => context.pop(),
             ),
           );
         },
       ),
+      // ── صفحة السلة ─────────────────────────────────────────────
       GoRoute(
         name: AppRoutes.cartScreen,
         path: AppRoutes.cartScreen,
         builder: (context, state) => MultiBlocProvider(
           providers: [
             BlocProvider.value(value: sl<CartCubit>()),
-            // ✅ create مش value عشان يعمل instance جديد ويشغل fetchCities
-            BlocProvider(
-              create: (_) => sl<ShippingCubit>()..fetchCities(),
-            ),
+            BlocProvider(create: (_) => sl<ShippingCubit>()..fetchCities()),
           ],
           child: CartScreen(
             onBackToShop: () => context.go(AppRoutes.homeScreen),
           ),
         ),
+      ),
+
+      // ── صفحة السياسات ──────────────────────────────────────────
+      GoRoute(
+        name: AppRoutes.policyScreen,
+        path: AppRoutes.policyScreen,
+        builder: (context, state) {
+          // لو الـ cartCubit مبعوث في الـ extra بنستخدمه، وإلا بنجيبه من sl
+          final cartCubit = state.extra is CartCubit
+              ? state.extra as CartCubit
+              : sl<CartCubit>();
+          return BlocProvider.value(
+            value: cartCubit,
+            child: const PolicyScreen(),
+          );
+        },
       ),
     ],
   );

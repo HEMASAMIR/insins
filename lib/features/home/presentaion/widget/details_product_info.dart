@@ -20,11 +20,20 @@ class DetailsProductInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(name,
+          Align(
+            alignment: Alignment.centerRight, // بيخلي الودجت نفسها تتركن يمين
+            child: Text(
+              name,
+              textAlign: TextAlign.right, // بيخلي الكلام جوه السطور يترص يمين
+              textDirection: TextDirection
+                  .rtl, // بيضمن إن العربي يبدأ من اليمين حتى لو فيه أرقام
               style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold)),
+                fontFamily: 'Cairo',
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           SizedBox(height: 8.h),
           Text("$price ر.س",
               style: TextStyle(

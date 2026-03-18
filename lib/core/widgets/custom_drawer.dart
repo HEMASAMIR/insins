@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/animation/slide_reveal_animation.dart';
+import 'package:insins/core/di/injection.dart';
 import 'package:insins/core/widgets/custom_menu.dart';
 import 'package:insins/core/widgets/drawer_item_widget.dart';
 import 'package:insins/core/widgets/language_selector_widget.dart';
 import 'package:insins/features/home/logic/categories_cubit/cubit/categories_cubit.dart';
+import 'package:insins/features/home/logic/cubit/homecubit_cubit.dart';
 import 'package:insins/features/home/presentaion/widget/custom_contact_button.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -73,16 +75,22 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   DrawerItemWidget(
                     title: 'قسم العطور',
+                    hasArrow: true,
                     onTap: () {
-                      final cubit = context.read<CategorieCubit>();
+                      final categoriesCubit = context.read<CategorieCubit>();
+                      final productsCubit = sl<ProductsCubit>();
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => BlocProvider.value(
-                            value: cubit,
+                          builder: (_) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider.value(value: categoriesCubit),
+                              BlocProvider.value(value: productsCubit),
+                            ],
                             child: CategoryMenuWidget(
                               onCategorySelected: (categoryId, categoryName) {
-                                cubit.selectCategory(categoryId);
+                                productsCubit.filterByCategory(categoryName);
                                 _navigate(onShopTap);
                               },
                             ),
@@ -90,18 +98,19 @@ class CustomDrawer extends StatelessWidget {
                         ),
                       );
                     },
-                    hasArrow: true,
                   ),
                   DrawerItemWidget(
                     title: 'المتجر',
-                    onTap: () => _navigate(onShopTap),
+                    onTap: () {
+                      // ✅ لما يضغط "المتجر" مباشرة يمسح الفلتر ويرجع كل المنتجات
+                      sl<ProductsCubit>().clearFilter();
+                      _navigate(onShopTap);
+                    },
                   ),
                   const Spacer(flex: 2),
-                  // ─── زر اللغة هنا ────────────────────────
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: const LanguageSelectorWidget(),
-                    // سيبناها فاضية عشان الـ Widget جواه الـ Logic بتاعه
                   ),
                   const Spacer(flex: 2),
                   SizedBox(height: 80.h),

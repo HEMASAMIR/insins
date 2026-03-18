@@ -10,10 +10,16 @@ class ProductRepositoryImpl implements ProductRepository {
 
   ProductRepositoryImpl(this.dio);
 
-  @override
-  Future<Either<Failure, List<ProductDetailsModel>>> getProducts() async {
+  // ─── Helper ────────────────────────────────────────────────────────────────
+  // بدل ما نكرر نفس الكود في كل method
+  Future<Either<Failure, List<ProductDetailsModel>>> _fetchProducts({
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
-      final response = await dio.get('/api/MobileApi/products');
+      final response = await dio.get(
+        '/api/MobileApi/products',
+        queryParameters: queryParameters,
+      );
       final List<dynamic> data = response.data['data'];
       final products =
           data.map((json) => ProductDetailsModel.fromJson(json)).toList();
@@ -31,47 +37,38 @@ class ProductRepositoryImpl implements ProductRepository {
     }
   }
 
+  // ─── Methods ───────────────────────────────────────────────────────────────
+
+  @override
+  Future<Either<Failure, List<ProductDetailsModel>>> getProducts() =>
+      _fetchProducts();
+
   @override
   Future<Either<Failure, List<ProductDetailsModel>>> getProductsByCategoryId(
-      int categoryId) async {
-    try {
-      final response = await dio.get(
-        '/api/MobileApi/products',
-        queryParameters: {'categoryId': categoryId}, // ✅
+    int categoryId,
+  ) =>
+      _fetchProducts(
+        queryParameters: {'categoryId': categoryId},
       );
-      final List<dynamic> data = response.data['data'];
-      final products =
-          data.map((json) => ProductDetailsModel.fromJson(json)).toList();
-      return Right(products);
-    } on DioException catch (e) {
-      log("Dio Error: ${e.response?.statusCode} - ${e.response?.data}");
-      return Left(ServerFailure(e.message ?? 'Server Error'));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
+
+  // ✅ إضافة جديدة - فلترة بالـ subCategoryId
+  @override
+  Future<Either<Failure, List<ProductDetailsModel>>> getProductsBySubCategoryId(
+    int subCategoryId,
+  ) =>
+      _fetchProducts(
+        queryParameters: {'subCategoryId': subCategoryId},
+      );
 
   @override
   Future<Either<Failure, List<ProductDetailsModel>>> searchProducts({
     required int categoryId,
     String? search,
-  }) async {
-    try {
-      final response = await dio.get(
-        '/api/MobileApi/products',
+  }) =>
+      _fetchProducts(
         queryParameters: {
           'categoryId': categoryId,
           if (search != null && search.isNotEmpty) 'search': search,
         },
       );
-      final List<dynamic> data = response.data['data'];
-      final products =
-          data.map((json) => ProductDetailsModel.fromJson(json)).toList();
-      return Right(products);
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Server Error'));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
 }

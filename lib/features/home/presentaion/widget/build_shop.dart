@@ -25,7 +25,6 @@ class ShopContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProductsCubit, ProductsState>(
-      // 🔥 السر هنا: لو الحالة "تحميل" بس إحنا معانا داتا قديمة (Loaded)، متخليش الشاشة ترعش وتظهر Loading
       buildWhen: (previous, current) {
         if (current is ProductsLoading && previous is ProductsLoaded) {
           return false;
@@ -43,46 +42,61 @@ class ShopContentWidget extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: kToolbarHeight + 40.h),
+
                 ShopHeaderWidget(
                   onHomeTap: onHomeTap,
                   onShopTap: null,
                 ),
 
+                SizedBox(height: 8.h),
+
+                // ─── Loading ────────────────────────────────────────
                 if (state is ProductsLoading)
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 100.h),
                     child: const Center(
-                        child: CircularProgressIndicator(color: Colors.black)),
-                  ),
-
-                if (state is ProductsError)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(state.message),
+                      child: CircularProgressIndicator(color: Colors.black),
                     ),
                   ),
 
-                // حالة نجاح التحميل
-                if (state is ProductsLoaded) ...[
-                  // 1. هيدر المنتجات (العدد والعنوان)
+                // ─── Error ──────────────────────────────────────────
+                if (state is ProductsError)
                   Padding(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 60.h),
+                    child: Center(
+                      child: Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 14.sp,
+                          color: Colors.red[400],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // ─── Loaded ─────────────────────────────────────────
+                if (state is ProductsLoaded) ...[
+                  // هيدر القسم والعدد
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           "${state.products.length} منتج",
                           style: TextStyle(
-                            fontSize: 14.sp,
-                            color: Colors.grey[600],
+                            fontSize: 13.sp,
+                            color: Colors.grey[500],
                             fontFamily: 'Cairo',
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
-                          "جميع المنتجات",
+                          state.selectedCategoryName,
                           style: TextStyle(
                             fontSize: 18.sp,
                             color: const Color(0xFF4A1D1D),
@@ -95,29 +109,81 @@ class ShopContentWidget extends StatelessWidget {
                   ),
 
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Divider(color: Colors.grey[200], thickness: 1),
                   ),
 
-                  // 2. ليستة المنتجات (واحدة فقط ومنظمة)
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                    itemCount: state.products.length,
-                    separatorBuilder: (context, index) =>
-                        SizedBox(height: 15.h),
-                    itemBuilder: (context, index) {
-                      final product = state.products[index];
-                      return VerticalProductCard(
-                        product: product,
-                        onTap: () => onProductSelected(product),
-                        onAdd: () => _handleAddToCart(context, product),
-                      );
-                    },
-                  ),
+                  SizedBox(height: 4.h),
+
+                  // ─── Empty State ─────────────────────────────────
+                  if (state.products.isEmpty)
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 32.w, vertical: 60.h),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 90.w,
+                            height: 90.w,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F0EC),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 42.sp,
+                              color: const Color(0xFF4A1D1D),
+                            ),
+                          ),
+                          SizedBox(height: 20.h),
+                          Text(
+                            'لا توجد منتجات في هذا القسم',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF4A1D1D),
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'جرّب اختيار قسم آخر أو تصفح جميع المنتجات',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 13.sp,
+                              color: Colors.grey[500],
+                              height: 1.6,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  // ─── Products List ───────────────────────────────
+                  if (state.products.isNotEmpty)
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 12.h),
+                      itemCount: state.products.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 16.h),
+                      itemBuilder: (context, index) {
+                        final product = state.products[index];
+                        return VerticalProductCard(
+                          product: product,
+                          onTap: () => onProductSelected(product),
+                          onAdd: () => _handleAddToCart(context, product),
+                        );
+                      },
+                    ),
+
+                  SizedBox(height: 16.h),
                 ],
+
                 const ScrollReveal(delay: 600, child: FooterWidget()),
               ],
             ),
@@ -127,7 +193,6 @@ class ShopContentWidget extends StatelessWidget {
     );
   }
 
-  // دالة الإضافة للسلة عشان الكود ميبقاش طويل جوه الـ Builder
   void _handleAddToCart(BuildContext context, dynamic product) {
     final cartItem = CartItemModel(
       id: product.id?.toString() ?? DateTime.now().toString(),

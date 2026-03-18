@@ -8,7 +8,12 @@ class ProductsLoading extends ProductsState {}
 
 class ProductsLoaded extends ProductsState {
   final List<ProductDetailsModel> products;
-  ProductsLoaded(this.products);
+  final String selectedCategoryName; // ✅ إضافة
+
+  ProductsLoaded(
+    this.products, {
+    this.selectedCategoryName = 'جميع المنتجات', // ✅ default value
+  });
 }
 
 class ProductsError extends ProductsState {

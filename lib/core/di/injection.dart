@@ -30,7 +30,7 @@ Future<void> setupDI() async {
   final prefs = await SharedPreferences.getInstance();
   sl.registerSingleton<SharedPreferences>(prefs);
 
-  // ── Repositories ─────────────────────────────────────
+  // ── Repositories ──────────────────────────────────────────
   sl.registerLazySingleton<ProductRepository>(
     () => ProductRepositoryImpl(DioHelper.dio!),
   );
@@ -53,8 +53,13 @@ Future<void> setupDI() async {
     () => CheckoutRepositoryImpl(DioHelper.dio!),
   );
 
-  // ── Cubits ───────────────────────────────────────────
-  sl.registerLazySingleton(() => ProductsCubit(sl()));
+  // ── Cubits ────────────────────────────────────────────────
+  // ✅ ProductsCubit - singleton عشان يفضل حي طول عمر الـ app
+  //    وبنحدد النوع صراحة عشان GetIt يعرف يجيب الـ ProductRepository الصح
+  sl.registerLazySingleton<ProductsCubit>(
+    () => ProductsCubit(sl<ProductRepository>()),
+  );
+
   sl.registerFactory(() => CategorieCubit(sl()));
   sl.registerLazySingleton(() => ProductDetailsCubit(sl()));
   sl.registerLazySingleton(() => CartCubit(sl<CartRepo>()));

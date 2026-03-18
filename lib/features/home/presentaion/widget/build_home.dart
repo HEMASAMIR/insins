@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:insins/core/animation/scroll_reveal.dart';
 import 'package:insins/features/home/presentaion/widget/about_scetion.dart';
 import 'package:insins/features/home/presentaion/widget/categories_section.dart';
@@ -31,6 +32,7 @@ class HomeContentWidget extends StatelessWidget {
       child: Column(
         children: [
           // 1. الـ Banner الرئيسي (Hero)
+
           HeroBannerWidget(
             onShopTap: onShopTap,
           ),

@@ -2,9 +2,11 @@
     
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="insins"
+        android:label="إنسينس للعطور" 
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:hardwareAccelerated="true"
@@ -42,8 +44,7 @@
         </intent>
 
         <package android:name="com.whatsapp" />
-        
-        <package android:name="com.whatsapp.w4b" />
+        <package android:name="com.whatsapp.w4b" /> 
 
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>

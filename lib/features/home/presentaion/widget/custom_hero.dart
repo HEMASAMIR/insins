@@ -19,14 +19,16 @@ class _HeroBannerWidgetState extends State<HeroBannerWidget>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..forward();
 
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+
     _slideUp = Tween<Offset>(
-      begin: const Offset(0, 0.3),
+      begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
@@ -39,102 +41,112 @@ class _HeroBannerWidgetState extends State<HeroBannerWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height, // ✅ الشاشة كاملة
       width: double.infinity,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage(
-            'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1400',
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// الصورة
+          const Image(
+            image: NetworkImage(
+              'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1400',
+            ),
+            fit: BoxFit.cover,
           ),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black.withOpacity(0.3),
-              Colors.black.withOpacity(0.65),
-            ],
-          ),
-        ),
-        child: FadeTransition(
-          opacity: _fadeIn,
-          child: SlideTransition(
-            position: _slideUp,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 1.5,
-                    color: AppColors.gold,
-                    margin: const EdgeInsets.only(bottom: 20),
-                  ),
-                  const Text(
-                    'عنوان الفخامة والتميّز',
-                    textAlign: TextAlign.center,
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Cairo',
-                      height: 1.4,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Title of Luxury & Distinction',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.gold,
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'أرقى أنواع العطور والبخور ومنتجات التجميل\nالمستوحاة من أصالة التراث العربي.',
-                    textAlign: TextAlign.center,
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      height: 1.8,
-                    ),
-                  ),
-                  const SizedBox(height: 36),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _HeroButton(
-                        label: 'اكتشف العود',
-                        filled: false,
-                        onTap: () => widget.onShopTap?.call(),
-                      ),
-                      const SizedBox(width: 16),
-                      _HeroButton(
-                        label: 'تسوق العطور',
-                        filled: true,
-                        onTap: () => widget.onShopTap?.call(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  const _BouncingArrow(),
+
+          /// gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.65),
                 ],
               ),
             ),
           ),
-        ),
+
+          /// 🔥 التوزيع الصح
+          Column(
+            children: [
+              const Spacer(),
+
+              /// الكلام في النص الحقيقي
+              FadeTransition(
+                opacity: _fadeIn,
+                child: SlideTransition(
+                  position: _slideUp,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 1.5,
+                          color: AppColors.gold,
+                          margin: const EdgeInsets.only(bottom: 20),
+                        ),
+                        const Text(
+                          'عنوان الفخامة والتميّز\nTitle of Luxury & Distinction',
+                          textAlign: TextAlign.center,
+                          textDirection: TextDirection.rtl,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'أرقى أنواع العطور والبخور ومنتجات التجميل\nالمستوحاة من أصالة التراث العربي.',
+                          textAlign: TextAlign.center,
+                          textDirection: TextDirection.rtl,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontFamily: 'Cairo',
+                            height: 1.8,
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _HeroButton(
+                              label: 'اكتشف العود',
+                              filled: false,
+                              onTap: () => widget.onShopTap?.call(),
+                            ),
+                            const SizedBox(width: 16),
+                            _HeroButton(
+                              label: 'تسوق العطور',
+                              filled: true,
+                              onTap: () => widget.onShopTap?.call(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const Spacer(),
+
+              /// السهم تحت
+              const Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: _BouncingArrow(),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -172,10 +184,7 @@ class _HeroButtonState extends State<_HeroButton> {
             color: widget.filled
                 ? (_hovered ? Colors.white : AppColors.gold)
                 : Colors.transparent,
-            border: Border.all(
-              color: AppColors.gold,
-              width: 1.5,
-            ),
+            border: Border.all(color: AppColors.gold, width: 1.5),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
@@ -211,6 +220,7 @@ class _BouncingArrowState extends State<_BouncingArrow>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -219,7 +229,9 @@ class _BouncingArrowState extends State<_BouncingArrow>
     _bounce = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0, 0.4),
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override

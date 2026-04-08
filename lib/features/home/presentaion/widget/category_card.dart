@@ -6,8 +6,7 @@ import 'package:insins/features/home/data/home_model/categories_model.dart';
 
 class CategoryCard extends StatelessWidget {
   final CategoryModel category;
-  final Function(dynamic)
-      onExploreTap; // غيرنا النوع هنا عشان يستقبل القسم الفرعي
+  final Function(dynamic) onExploreTap;
 
   const CategoryCard(
     this.category, {

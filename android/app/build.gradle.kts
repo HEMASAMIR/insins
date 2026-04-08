@@ -7,20 +7,16 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// 1. تعديل المسار هنا عشان يقرأ الملف من فولدر android
 val keystoreProperties = Properties()
-val keystorePropertiesFile = project.rootProject.file("android/key.properties") 
+val keystorePropertiesFile = project.rootProject.file("key.properties") 
 
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-} else {
-    // تنبيه بسيط لو الملف مش في مكانه عشان ما يضربش Error غامض
-    println("Warning: key.properties not found at ${keystorePropertiesFile.absolutePath}")
 }
 
 android {
     namespace = "com.insins.app"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -35,36 +31,35 @@ android {
     defaultConfig {
         applicationId = "com.insins.app"
         minSdk = flutter.minSdkVersion
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 36
+        
+        // تم تحديث الـ Version عشان ترفع نسخة جديدة للمتجر
+        versionCode = 2
+        versionName = "1.1"
     }
 
     signingConfigs {
-        // إنشاء إعدادات التوقيع لنسخة الـ Release
         create("release") {
-            if (keystoreProperties.containsKey("keyAlias")) {
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = file(keystoreProperties["storeFile"] as String)
-                storePassword = keystoreProperties["storePassword"] as String
-            }
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+            storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
+            storePassword = keystoreProperties["storePassword"] as String?
         }
     }
 
     buildTypes {
         release {
-            // ربط نسخة الـ Release بالمفتاح
             signingConfig = signingConfigs.getByName("release")
             
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // قفلنا الـ Minify والـ Shrink عشان نمنع حذف ملفات الـ Clean Architecture المهمة
+            isMinifyEnabled = false 
+            isShrinkResources = false
+            
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-
         debug {
             signingConfig = signingConfigs.getByName("debug")
         }
